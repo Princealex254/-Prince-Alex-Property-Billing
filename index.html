@@ -1199,58 +1199,69 @@
             const selectedTenantId = document.getElementById('selectTenant').value;
             const selectedTenant = tenants.find(t => t.id === selectedTenantId);
 
+            const rentInput = document.getElementById('rent');
+            const lastWaterReadingInput = document.getElementById('lastWaterReading');
+            const currentWaterReadingInput = document.getElementById('currentWaterReading');
+            const waterAmountInput = document.getElementById('waterAmount');
+            const garbageAmountInput = document.getElementById('garbageAmount');
+            const otherPaymentsInput = document.getElementById('otherPayments');
+            const paymentDeadlineInput = document.getElementById('paymentDeadline');
+            const totalPaymentDisplay = document.getElementById('totalPaymentDisplay');
+
             if (selectedTenant) {
-                document.getElementById('rent').value = selectedTenant.amountCharged || '';
-                document.getElementById('lastWaterReading').value = selectedTenant.lastWaterReading || 0;
-                document.getElementById('currentWaterReading').value = ''; // Clear current reading for new input
-                document.getElementById('waterAmount').value = ''; // Clear calculated water amount
-                document.getElementById('garbageAmount').value = ''; // Clear for new bill
-                document.getElementById('otherPayments').value = ''; // Clear for new bill
-                document.getElementById('paymentDeadline').value = ''; // Clear for new bill
+                if (rentInput) rentInput.value = selectedTenant.amountCharged || '';
+                if (lastWaterReadingInput) lastWaterReadingInput.value = selectedTenant.lastWaterReading || 0;
+                if (currentWaterReadingInput) currentWaterReadingInput.value = ''; // Clear current reading for new input
+                if (waterAmountInput) waterAmountInput.value = ''; // Clear calculated water amount
+                if (garbageAmountInput) garbageAmountInput.value = ''; // Clear for new bill
+                if (otherPaymentsInput) otherPaymentsInput.value = ''; // Clear for new bill
+                if (paymentDeadlineInput) paymentDeadlineInput.value = ''; // Clear for new bill
                 updateBillTotal(); // Recalculate total after populating rent
             } else {
                 // Clear all fields if no tenant is selected
-                document.getElementById('rent').value = '';
-                document.getElementById('lastWaterReading').value = '';
-                document.getElementById('currentWaterReading').value = '';
-                document.getElementById('waterAmount').value = '';
-                document.getElementById('garbageAmount').value = '';
-                document.getElementById('otherPayments').value = '';
-                document.getElementById('paymentDeadline').value = '';
-                document.getElementById('totalPaymentDisplay').textContent = 'Ksh 0.00';
+                if (rentInput) rentInput.value = '';
+                if (lastWaterReadingInput) lastWaterReadingInput.value = '';
+                if (currentWaterReadingInput) currentWaterReadingInput.value = '';
+                if (waterAmountInput) waterAmountInput.value = '';
+                if (garbageAmountInput) garbageAmountInput.value = '';
+                if (otherPaymentsInput) otherPaymentsInput.value = '';
+                if (paymentDeadlineInput) paymentDeadlineInput.value = '';
+                if (totalPaymentDisplay) totalPaymentDisplay.textContent = 'Ksh 0.00';
             }
             calculateWaterAmount(); // Ensure water amount is calculated after tenant selection
         }
 
         function calculateWaterAmount() {
-            const lastReading = parseFloat(document.getElementById('lastWaterReading').value) || 0;
-            const currentReading = parseFloat(document.getElementById('currentWaterReading').value) || 0;
-            const pricePerUnit = parseFloat(document.getElementById('waterPricePerUnit').value) || 0;
+            const lastReading = parseFloat(document.getElementById('lastWaterReading')?.value) || 0;
+            const currentReading = parseFloat(document.getElementById('currentWaterReading')?.value) || 0;
+            const pricePerUnit = parseFloat(document.getElementById('waterPricePerUnit')?.value) || 0;
+            const waterAmountInput = document.getElementById('waterAmount');
 
             let waterUnits = 0;
             if (currentReading >= lastReading) {
                 waterUnits = currentReading - lastReading;
             } else {
                 // Handle case where current reading is less than last reading (e.g., meter reset)
-                // For simplicity, we'll assume 0 units if current < last for now,
-                // or you might want to show an error/warning.
-                // For a real system, this would need more robust handling.
-                // showModal("Warning", "Current water reading is less than last month's reading. Assuming 0 units for this bill. Please verify meter readings.");
-                waterUnits = 0; // Or handle as an error that prevents bill generation
+                waterUnits = 0;
             }
 
             const waterAmount = waterUnits * pricePerUnit;
-            document.getElementById('waterAmount').value = waterAmount.toFixed(2);
+            if (waterAmountInput) {
+                waterAmountInput.value = waterAmount.toFixed(2);
+            }
             updateBillTotal(); // Recalculate total after water amount changes
         }
 
         function updateBillTotal() {
-            const rent = parseFloat(document.getElementById('rent').value) || 0;
-            const waterAmount = parseFloat(document.getElementById('waterAmount').value) || 0;
-            const garbageAmount = parseFloat(document.getElementById('garbageAmount').value) || 0;
-            const otherPayments = parseFloat(document.getElementById('otherPayments').value) || 0;
+            const rent = parseFloat(document.getElementById('rent')?.value) || 0;
+            const waterAmount = parseFloat(document.getElementById('waterAmount')?.value) || 0;
+            const garbageAmount = parseFloat(document.getElementById('garbageAmount')?.value) || 0;
+            const otherPayments = parseFloat(document.getElementById('otherPayments')?.value) || 0;
             const total = rent + waterAmount + garbageAmount + otherPayments;
-            document.getElementById('totalPaymentDisplay').textContent = `Ksh ${total.toFixed(2)}`;
+            const totalPaymentDisplay = document.getElementById('totalPaymentDisplay');
+            if (totalPaymentDisplay) {
+                totalPaymentDisplay.textContent = `Ksh ${total.toFixed(2)}`;
+            }
         }
 
         function updateGeneratedBillsList() {
@@ -1604,15 +1615,15 @@
 
         async function handleGenerateBill() {
             const selectedTenantId = document.getElementById('selectTenant').value;
-            const rent = parseFloat(document.getElementById('rent').value) || 0;
-            const lastWaterReading = parseFloat(document.getElementById('lastWaterReading').value) || 0;
-            const currentWaterReading = parseFloat(document.getElementById('currentWaterReading').value) || 0;
-            const waterPricePerUnit = parseFloat(document.getElementById('waterPricePerUnit').value) || 0;
-            const waterAmount = parseFloat(document.getElementById('waterAmount').value) || 0; // This is already calculated
-            const garbageAmount = parseFloat(document.getElementById('garbageAmount').value) || 0;
-            const otherPayments = parseFloat(document.getElementById('otherPayments').value) || 0;
-            const paymentDeadline = document.getElementById('paymentDeadline').value;
-            const totalPayment = parseFloat(document.getElementById('totalPaymentDisplay').textContent.replace('Ksh ', '')) || 0;
+            const rent = parseFloat(document.getElementById('rent')?.value) || 0;
+            const lastWaterReading = parseFloat(document.getElementById('lastWaterReading')?.value) || 0;
+            const currentWaterReading = parseFloat(document.getElementById('currentWaterReading')?.value) || 0;
+            const waterPricePerUnit = parseFloat(document.getElementById('waterPricePerUnit')?.value) || 0;
+            const waterAmount = parseFloat(document.getElementById('waterAmount')?.value) || 0; // This is already calculated
+            const garbageAmount = parseFloat(document.getElementById('garbageAmount')?.value) || 0;
+            const otherPayments = parseFloat(document.getElementById('otherPayments')?.value) || 0;
+            const paymentDeadline = document.getElementById('paymentDeadline')?.value;
+            const totalPayment = parseFloat(document.getElementById('totalPaymentDisplay')?.textContent.replace('Ksh ', '')) || 0;
 
 
             if (!selectedTenantId || !rent || !paymentDeadline) {
@@ -1662,15 +1673,24 @@
 
                 showModal("Success", "Bill generated and saved successfully!");
                 // Reset form fields
-                document.getElementById('selectTenant').value = '';
-                document.getElementById('rent').value = '';
-                document.getElementById('lastWaterReading').value = '';
-                document.getElementById('currentWaterReading').value = '';
-                document.getElementById('waterAmount').value = '';
-                document.getElementById('garbageAmount').value = '';
-                document.getElementById('otherPayments').value = '';
-                document.getElementById('paymentDeadline').value = '';
-                document.getElementById('totalPaymentDisplay').textContent = 'Ksh 0.00';
+                const selectTenantElement = document.getElementById('selectTenant');
+                if (selectTenantElement) selectTenantElement.value = '';
+                const rentElement = document.getElementById('rent');
+                if (rentElement) rentElement.value = '';
+                const lastWaterReadingElement = document.getElementById('lastWaterReading');
+                if (lastWaterReadingElement) lastWaterReadingElement.value = '';
+                const currentWaterReadingElement = document.getElementById('currentWaterReading');
+                if (currentWaterReadingElement) currentWaterReadingElement.value = '';
+                const waterAmountElement = document.getElementById('waterAmount');
+                if (waterAmountElement) waterAmountElement.value = '';
+                const garbageAmountElement = document.getElementById('garbageAmount');
+                if (garbageAmountElement) garbageAmountElement.value = '';
+                const otherPaymentsElement = document.getElementById('otherPayments');
+                if (otherPaymentsElement) otherPaymentsElement.value = '';
+                const paymentDeadlineElement = document.getElementById('paymentDeadline');
+                if (paymentDeadlineElement) paymentDeadlineElement.value = '';
+                const totalPaymentDisplayElement = document.getElementById('totalPaymentDisplay');
+                if (totalPaymentDisplayElement) totalPaymentDisplayElement.textContent = 'Ksh 0.00';
                 // Firestore listeners will trigger re-render, no need to call renderDashboardPage directly
             } catch (error) {
                 console.error("Error generating bill:", error);
