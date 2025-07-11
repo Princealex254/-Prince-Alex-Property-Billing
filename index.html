@@ -212,10 +212,36 @@
         async function initializeFirebase() {
             try {
                 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                let firebaseConfig = {}; // Initialize as an empty object
+
+                // Safely parse __firebase_config
+                try {
+                    const rawConfigString = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+                    // Only parse if rawConfigString is not an empty string, otherwise it's already {}
+                    // If rawConfigString is just '{}', JSON.parse will handle it, but it's effectively an empty config.
+                    if (rawConfigString && rawConfigString !== '{}') { // Added check for empty string and empty object string
+                        firebaseConfig = JSON.parse(rawConfigString);
+                    } else if (rawConfigString === '{}') {
+                        firebaseConfig = {}; // Explicitly set to empty object if it's just '{}'
+                    }
+                } catch (e) {
+                    console.error("Error parsing Firebase configuration string:", e);
+                    showModal("Configuration Error", "Invalid Firebase configuration format. Please ensure it's a valid JSON string.");
+                    renderLoginPage();
+                    return;
+                }
+
+                // Crucial check: Ensure firebaseConfig has an apiKey before initializing
+                // This handles cases where __firebase_config was empty or parsed to an empty object.
+                if (!firebaseConfig.apiKey) {
+                    console.error("Firebase configuration is missing API Key. Cannot initialize Firebase.");
+                    showModal("Configuration Error", "Firebase API Key is missing. Please ensure Firebase is correctly configured in the environment.");
+                    renderLoginPage();
+                    return;
+                }
 
                 firebaseApp = initializeApp(firebaseConfig);
+                
                 db = getFirestore(firebaseApp);
                 auth = getAuth(firebaseApp);
 
@@ -241,18 +267,26 @@
                     }
                 });
 
-                // Initial sign-in attempt (e.g., anonymous for demo, or using token if available)
+                // Initial sign-in attempt (using custom token if available, otherwise anonymous)
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else {
-                    // This will be handled by the login form now, or if no user is present,
-                    // the onAuthStateChanged will redirect to login.
+                    // If no initial token, the user will see the login page and can sign in via email/password or anonymously.
+                    // No explicit signInAnonymously here, as the login form handles it.
                 }
 
             } catch (error) {
-                console.error("Error initializing Firebase:", error);
-                showModal("Firebase Error", `Failed to initialize Firebase: ${error.message}`);
-                // Fallback to login page or display a persistent error
+                console.error("Error during Firebase initialization or authentication:", error);
+                let errorMessage = `An unexpected error occurred during Firebase setup: ${error.message}`;
+                // More specific error messages for common Firebase issues
+                if (error.code === 'auth/network-request-failed') {
+                    errorMessage = "Network error. Please check your internet connection.";
+                } else if (error.code === 'app/invalid-credential') {
+                    errorMessage = "Firebase project credentials are invalid. Please check your Firebase configuration.";
+                } else if (error.message.includes("No Firebase App '[DEFAULT]' has been created")) {
+                    errorMessage = "Firebase App not initialized. This usually means your firebaseConfig is empty or invalid.";
+                }
+                showModal("Firebase Error", errorMessage);
                 renderLoginPage();
             }
         }
@@ -376,6 +410,7 @@
                             >
                                 Login
                             </button>
+                        </form>
                     </div>
                 </div>
             `;
