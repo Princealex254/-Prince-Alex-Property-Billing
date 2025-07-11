@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prince Alex Property Billing System</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">\
     <style>
         body {
@@ -69,6 +71,7 @@
 </head>
 <body class="font-inter antialiased bg-gray-50 min-h-screen">
     <div id="app">
+        <!-- Content will be dynamically loaded here by JavaScript -->
         <div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
             <div class="text-center">
                 <div class="loading-spinner rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
@@ -77,9 +80,11 @@
         </div>
     </div>
 
+    <!-- Libraries for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+    <!-- Firebase Config Injection -->
     <script>
         window.__firebase_config = JSON.stringify({
             apiKey: "AIzaSyB1rF-ATVbH04EYa0ADc9KtDVO9UigYwn8",
@@ -102,7 +107,7 @@
             Home: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
             Users: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
             Building: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9.5 16h5"/><path d="M9.5 12h5"/><path d="M9.5 8h5"/><path d="M12 22V2"/></svg>`,
-            Receipt: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucude-receipt"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2h-2.5a2 2 0 0 1-2-2H6.5a2 2 0 0 1-2 2H4Z"/><path d="M18 6H8"/><path d="M18 10H8"/><path d="M18 14H8"/><path d="M18 18H8"/></svg>`,
+            Receipt: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-receipt"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2h-2.5a2 2 0 0 1-2-2H6.5a2 2 0 0 1-2 2H4Z"/><path d="M18 6H8"/><path d="M18 10H8"/><path d="M18 14H8"/><path d="M18 18H8"/></svg>`,
             PlusCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>`,
             Edit: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>`,
             Trash2: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`,
@@ -114,8 +119,7 @@
             Search: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`,
             DollarSign: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dollar-sign"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
             Menu: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>`,
-            X: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
-            Download: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>`
+            X: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`
         };
 
 
@@ -449,6 +453,7 @@
 
             appDiv.innerHTML = `
                 <div class="flex h-screen bg-gray-100">
+                    <!-- Sidebar Navigation -->
                     <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-gray-800 text-white flex flex-col p-4 shadow-lg transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out">
                         <div class="flex items-center mb-8">
                             <img src="https://placehold.co/40x40/4F46E5/FFFFFF?text=P" alt="Logo" class="rounded-full mr-3" />
@@ -491,7 +496,9 @@
                         </div>
                     </aside>
 
+                    <!-- Main Content Area -->
                     <main class="flex-1 overflow-auto p-8 ${isSidebarOpen ? 'lg:ml-64' : 'lg:ml-0'} transition-all duration-300 ease-in-out">
+                        <!-- Header -->
                         <header class="bg-white rounded-xl shadow-md p-6 mb-8 flex justify-between items-center">
                             <h2 class="text-3xl font-bold text-gray-800">Welcome, ${userName}!</h2>
                             <button id="menuToggleBtn" class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg">
@@ -505,6 +512,7 @@
                             </div>
                         </header>
 
+                        <!-- Content Section based on activeTab -->
                         <div id="contentSection"></div>
                     </main>
                 </div>
@@ -569,11 +577,12 @@
                 <section class="bg-white rounded-xl shadow-md p-6 mb-8">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-2xl font-bold text-gray-800">Your Properties</h3>
-                        <button id="addPropertyBtn" class="bg-blue-600 text-white px-5 py-2 rounded-lg flex items-center hover:bg-blue-700 transition duration-200 shadow-md">
-                            ${icons.PlusCircle}
-                            <span class="ml-2">Add Property</span>
+                        <button id="addPropertyBtn"
+                            class="bg-blue-600 text-white px-5 py-2 rounded-lg flex items-center hover:bg-blue-700 transition duration-200 shadow-md">
+                            ${icons.PlusCircle} <span class="ml-2">Add Property</span>
                         </button>
                     </div>
+
                     <div id="propertiesList" class="space-y-6">
                         ${properties.length === 0 ? `
                             <p class="text-gray-600 text-center py-8">No properties added yet. Click "Add Property" to get started!</p>
@@ -581,6 +590,7 @@
                     </div>
                 </section>
             `;
+
             document.getElementById('addPropertyBtn').addEventListener('click', () => showAddPropertyModal());
             updatePropertiesList();
         }
@@ -596,9 +606,12 @@
 
             propertiesListDiv.innerHTML = properties.map(property => {
                 const currentPropertySearchQuery = propertyTenantSearchQueries[property.id]?.toLowerCase() || '';
+
                 const tenantsForProperty = tenants.filter(t => 
                     t.propertyId === property.id && 
-                    (currentPropertySearchQuery === '' || t.name.toLowerCase().includes(currentPropertySearchQuery) || t.houseNumber.toLowerCase().includes(currentPropertySearchQuery))
+                    (currentPropertySearchQuery === '' || 
+                     t.name.toLowerCase().includes(currentPropertySearchQuery) || 
+                     t.houseNumber.toLowerCase().includes(currentPropertySearchQuery))
                 );
 
                 return `
@@ -606,20 +619,26 @@
                         <div class="flex justify-between items-center mb-4">
                             <h4 class="text-xl font-semibold text-gray-700">${property.name}</h4>
                             <div class="flex space-x-2">
-                                <button data-property-id="${property.id}" class="add-tenant-btn bg-green-500 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-green-600 transition duration-200">
+                                <button data-property-id="${property.id}"
+                                    class="add-tenant-btn bg-green-500 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-green-600 transition duration-200">
                                     ${icons.PlusCircle} <span class="ml-1">Add Tenant</span>
                                 </button>
-                                <button data-property-id="${property.id}" class="delete-property-btn bg-red-500 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-red-600 transition duration-200">
+                                <button data-property-id="${property.id}"
+                                    class="delete-property-btn bg-red-500 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-red-600 transition duration-200">
                                     ${icons.Trash2} <span class="ml-1">Delete Property</span>
                                 </button>
                             </div>
                         </div>
+                        
                         <div class="relative mb-4">
-                            <input type="text" id="tenantSearchInput-${property.id}" data-property-id="${property.id}" placeholder="Search tenants by name or house number in ${property.name}..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" value="${currentPropertySearchQuery}">
+                            <input type="text" id="tenantSearchInput-${property.id}" data-property-id="${property.id}" placeholder="Search tenants by name or house number in ${property.name}..."
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                   value="${currentPropertySearchQuery}">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 ${icons.Search}
                             </div>
                         </div>
+
                         <p class="text-gray-600 mb-3">Tenants in ${property.name}:</p>
                         ${tenantsForProperty.length === 0 ? `
                             <p class="text-gray-500 text-sm italic ml-4">No tenants added for this property yet or no matching tenants found.</p>
@@ -642,29 +661,34 @@
                                             const balanceColor = tenant.outstandingBalance > 0 ? 'text-red-600 font-semibold' : 'text-green-600';
                                             const balanceText = tenant.outstandingBalance > 0 ? `Ksh ${tenant.outstandingBalance.toFixed(2)} Due` : 'Paid';
                                             return `
-                                                <tr class="hover:bg-gray-50">
-                                                    <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${tenant.name}</td>
-                                                    <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${tenant.houseNumber}</td>
-                                                    <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${tenant.houseType}</td>
-                                                    <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">Ksh ${tenant.amountCharged.toFixed(2)}</td>
-                                                    <td class="py-3 px-4 whitespace-nowrap text-sm ${balanceColor}">${balanceText}</td>
-                                                    <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${tenant.phoneNumber}</td>
-                                                    <td class="py-3 px-4 whitespace-nowrap text-sm">
-                                                        <div class="flex space-x-2">
-                                                            <button data-tenant-id="${tenant.id}" class="payment-btn text-purple-600 hover:text-purple-800 transition duration-200" title="Record Payment">
-                                                                ${icons.Wallet}
-                                                            </button>
-                                                            <button data-tenant-id="${tenant.id}" class="edit-tenant-btn text-blue-600 hover:text-blue-800 transition duration-200" title="Edit Tenant">
-                                                                ${icons.Edit}
-                                                            </button>
-                                                            <button data-tenant-id="${tenant.id}" class="delete-tenant-btn text-red-600 hover:text-red-800 transition duration-200" title="Delete Tenant">
-                                                                ${icons.Trash2}
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            `;
-                                        }).join('')}
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${tenant.name}</td>
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${tenant.houseNumber}</td>
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${tenant.houseType}</td>
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">Ksh ${tenant.amountCharged.toFixed(2)}</td>
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm ${balanceColor}">${balanceText}</td>
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${tenant.phoneNumber}</td>
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm">
+                                                    <div class="flex space-x-2">
+                                                        <button data-tenant-id="${tenant.id}"
+                                                            class="payment-btn text-purple-600 hover:text-purple-800 transition duration-200"
+                                                            title="Record Payment">
+                                                            ${icons.Wallet}
+                                                        </button>
+                                                        <button data-tenant-id="${tenant.id}"
+                                                            class="edit-tenant-btn text-blue-600 hover:text-blue-800 transition duration-200"
+                                                            title="Edit Tenant">
+                                                            ${icons.Edit}
+                                                        </button>
+                                                        <button data-tenant-id="${tenant.id}"
+                                                            class="delete-tenant-btn text-red-600 hover:text-red-800 transition duration-200"
+                                                            title="Delete Tenant">
+                                                            ${icons.Trash2}
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        `;}).join('')}
                                     </tbody>
                                 </table>
                             </div>
@@ -673,952 +697,1278 @@
                 `;
             }).join('');
 
-            // Add event listeners dynamically after updating the list
-            document.querySelectorAll('.add-tenant-btn').forEach(button => {
+            // Attach event listeners after rendering
+            propertiesListDiv.querySelectorAll('.add-tenant-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const propertyId = e.currentTarget.dataset.propertyId;
-                    showAddTenantModal(propertyId);
+                    const selectedProperty = properties.find(p => p.id === propertyId);
+                    if (selectedProperty) showAddEditTenantModal(selectedProperty);
                 });
             });
-            document.querySelectorAll('.delete-property-btn').forEach(button => {
+            propertiesListDiv.querySelectorAll('.delete-property-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const propertyId = e.currentTarget.dataset.propertyId;
-                    showModal("Confirm Delete", "Are you sure you want to delete this property and all its associated tenants and bills? This action is irreversible.", "confirm", () => deleteProperty(propertyId));
+                    handleDeleteProperty(propertyId);
                 });
             });
-            document.querySelectorAll('.edit-tenant-btn').forEach(button => {
+            propertiesListDiv.querySelectorAll('.edit-tenant-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const tenantId = e.currentTarget.dataset.tenantId;
-                    showEditTenantModal(tenantId);
+                    const tenantToEdit = tenants.find(t => t.id === tenantId);
+                    if (tenantToEdit) showAddEditTenantModal(properties.find(p => p.id === tenantToEdit.propertyId), tenantToEdit);
                 });
             });
-            document.querySelectorAll('.delete-tenant-btn').forEach(button => {
+            propertiesListDiv.querySelectorAll('.delete-tenant-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const tenantId = e.currentTarget.dataset.tenantId;
-                    showModal("Confirm Delete", "Are you sure you want to delete this tenant and all their associated bills and payments? This action is irreversible.", "confirm", () => deleteTenant(tenantId));
+                    handleDeleteTenant(tenantId);
                 });
             });
-            document.querySelectorAll('.payment-btn').forEach(button => {
+            propertiesListDiv.querySelectorAll('.payment-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const tenantId = e.currentTarget.dataset.tenantId;
-                    showRecordPaymentModal(tenantId);
+                    const tenant = tenants.find(t => t.id === tenantId);
+                    if (tenant) showPaymentModal(tenant);
                 });
             });
-            document.querySelectorAll('input[id^="tenantSearchInput-"]').forEach(input => {
+
+            // Attach event listeners for per-property search inputs
+            propertiesListDiv.querySelectorAll('input[id^="tenantSearchInput-"]').forEach(input => {
                 input.addEventListener('input', (e) => {
                     const propertyId = e.target.dataset.propertyId;
                     propertyTenantSearchQueries[propertyId] = e.target.value;
-                    updatePropertiesList();
+                    updatePropertiesList(); // Re-render to apply the filter
                 });
             });
         }
 
+        async function showAddPropertyModal() {
+            let newPropertyName = '';
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'p-4';
+            contentDiv.innerHTML = `
+                <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalPropertyName">
+                    Property Name
+                </label>
+                <input
+                    type="text"
+                    id="modalPropertyName"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g., Green Valley Apartments"
+                    required
+                />
+            `;
+
+            showModal(
+                "Add New Property",
+                contentDiv,
+                'confirm',
+                async () => {
+                    newPropertyName = document.getElementById('modalPropertyName').value.trim();
+                    if (newPropertyName) {
+                        await handleAddProperty(newPropertyName);
+                    } else {
+                        showModal("Error", "Property name cannot be empty.");
+                    }
+                }
+            );
+            // Focus on the input field after the modal is rendered
+            setTimeout(() => {
+                const input = document.getElementById('modalPropertyName');
+                if (input) input.focus();
+            }, 100);
+        }
+
+        async function showAddEditTenantModal(selectedProperty, editingTenant = null) {
+            let newTenantData = editingTenant ? { ...editingTenant } : {
+                name: '', houseNumber: '', houseType: 'Apartment', amountCharged: '', phoneNumber: '', propertyId: selectedProperty.id, lastWaterReading: 0, outstandingBalance: 0
+            };
+
+            const modalTitle = editingTenant ? "Edit Tenant" : `Add Tenant to ${selectedProperty.name}`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'p-4 space-y-4';
+            contentDiv.innerHTML = `
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalTenantName">
+                        Tenant Name
+                    </label>
+                    <input
+                        type="text"
+                        id="modalTenantName"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., John Doe"
+                        value="${newTenantData.name}"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalHouseNumber">
+                        House Number
+                    </label>
+                    <input
+                        type="text"
+                        id="modalHouseNumber"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., A-101"
+                        value="${newTenantData.houseNumber}"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalHouseType">
+                        House Type
+                    </label>
+                    <select
+                        id="modalHouseType"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        required
+                    >
+                        ${houseTypes.map(type => `<option value="${type}" ${newTenantData.houseType === type ? 'selected' : ''}>${type}</option>`).join('')}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalAmountCharged">
+                        Amount Charged (Ksh)
+                    </label>
+                    <input
+                        type="number"
+                        id="modalAmountCharged"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., 15000"
+                        value="${newTenantData.amountCharged}"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalPhoneNumber">
+                        Phone Number
+                    </label>
+                    <input
+                        type="text"
+                        id="modalPhoneNumber"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., +2547XXXXXXXX"
+                        value="${newTenantData.phoneNumber}"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalLastWaterReading">
+                        Last Water Reading
+                    </label>
+                    <input
+                        type="number"
+                        id="modalLastWaterReading"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., 100"
+                        value="${newTenantData.lastWaterReading}"
+                        required
+                    />
+                </div>
+            `;
+
+            showModal(
+                modalTitle,
+                contentDiv,
+                'confirm',
+                async () => {
+                    newTenantData.name = document.getElementById('modalTenantName').value.trim();
+                    newTenantData.houseNumber = document.getElementById('modalHouseNumber').value.trim();
+                    newTenantData.houseType = document.getElementById('modalHouseType').value;
+                    newTenantData.amountCharged = document.getElementById('modalAmountCharged').value.trim();
+                    newTenantData.phoneNumber = document.getElementById('modalPhoneNumber').value.trim();
+                    newTenantData.lastWaterReading = parseFloat(document.getElementById('modalLastWaterReading').value) || 0;
+
+
+                    if (!newTenantData.name || !newTenantData.houseNumber || !newTenantData.amountCharged || !newTenantData.phoneNumber) {
+                        showModal("Error", "Please fill all required tenant fields.");
+                        return;
+                    }
+
+                    await handleSaveTenant(newTenantData, editingTenant);
+                }
+            );
+        }
+
+        async function showPaymentModal(tenant) {
+            let paymentAmount = '';
+            let paymentDate = new Date().toISOString().split('T')[0]; // Default to today
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'p-4 space-y-4';
+            contentDiv.innerHTML = `
+                <p class="text-lg font-semibold text-gray-800">Record Payment for: ${tenant.name} (House ${tenant.houseNumber})</p>
+                <p class="text-md text-gray-700">Outstanding Balance: <span class="font-bold text-red-600">Ksh ${tenant.outstandingBalance.toFixed(2)}</span></p>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="paymentAmount">
+                        Amount Paid (Ksh)
+                    </label>
+                    <input
+                        type="number"
+                        id="paymentAmount"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., 10000"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="paymentDate">
+                        Payment Date
+                    </label>
+                    <input
+                        type="date"
+                        id="paymentDate"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        value="${paymentDate}"
+                        required
+                    />
+                </div>
+            `;
+
+            showModal(
+                "Record Payment",
+                contentDiv,
+                'confirm',
+                async () => {
+                    paymentAmount = parseFloat(document.getElementById('paymentAmount').value) || 0;
+                    paymentDate = document.getElementById('paymentDate').value;
+
+                    if (paymentAmount <= 0) {
+                        showModal("Error", "Payment amount must be greater than zero.");
+                        return;
+                    }
+                    await handleRecordPayment(tenant.id, paymentAmount, paymentDate);
+                }
+            );
+        }
 
         function renderBillingSection(parentEl) {
-            const propertiesExist = properties.length > 0;
             parentEl.innerHTML = `
                 <section class="bg-white rounded-xl shadow-md p-6 mb-8">
-                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                        <h3 class="text-2xl font-bold text-gray-800">Billing & Receipts</h3>
-                        <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                            <select id="propertyFilterForBilling" class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Filter by Property</option>
-                                ${properties.map(p => `<option value="${p.id}" ${p.id === selectedPropertyForBillingFilter ? 'selected' : ''}>${p.name}</option>`).join('')}
-                            </select>
-                            <div class="relative w-full sm:w-auto">
-                                <input type="text" id="billingTenantSearchInput" placeholder="Search bills by tenant..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" value="${billingTenantSearchQuery}">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    ${icons.Search}
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Billing & Receipts</h3>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Bill Generation Form -->
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-700 mb-4">Generate New Bill</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="filterPropertyBilling" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Filter by Property
+                                    </label>
+                                    <select
+                                        id="filterPropertyBilling"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                                    >
+                                        <option value="">All Properties</option>
+                                        ${properties.map(property => `
+                                            <option value="${property.id}" ${selectedPropertyForBillingFilter === property.id ? 'selected' : ''}>
+                                                ${property.name}
+                                            </option>
+                                        `).join('')}
+                                    </select>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">Search and Select Tenant</label>
+                                    <div class="relative">
+                                        <input type="text" id="billingTenantSearchInput" placeholder="Search tenant by name or house number..."
+                                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            ${icons.Search}
+                                        </div>
+                                    </div>
+                                    <select
+                                        id="selectTenant"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                                        required
+                                    >
+                                        <option value="">-- Select a Tenant --</option>
+                                    </select>
+                                </div>
 
-                    <div class="bg-gray-50 p-6 rounded-xl shadow-inner mb-8">
-                        <h4 class="text-xl font-bold text-gray-700 mb-4">Bulk Bill Generation</h4>
-                        <p class="text-gray-600 mb-4">Generate a standard 'Rent + Garbage' bill for all tenants in a selected property.</p>
-                        <div class="flex flex-col md:flex-row items-stretch md:items-end gap-4">
-                            <div class="flex-grow">
-                                <label for="bulkPropertySelect" class="block text-sm font-medium text-gray-700 mb-1">Select Property</label>
-                                <select id="bulkPropertySelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    ${properties.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
-                                </select>
-                            </div>
-                            <button id="bulkGenerateBtn" class="w-full md:w-auto bg-green-600 text-white px-6 py-2 rounded-lg flex items-center justify-center hover:bg-green-700 transition duration-200 shadow-md ${!propertiesExist ? 'opacity-50 cursor-not-allowed' : ''}" ${!propertiesExist ? 'disabled' : ''}>
-                                ${icons.PlusCircle}
-                                <span class="ml-2">Generate Bills</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="createBillSection" class="bg-gray-50 p-6 rounded-xl shadow-inner mb-8">
-                        <h4 class="text-xl font-bold text-gray-700 mb-4">Create New Bill</h4>
-                        <form id="billForm" class="space-y-4">
-                            <div>
-                                <label for="tenantSelect" class="block text-sm font-medium text-gray-700">Select Tenant</label>
-                                <select id="tenantSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="">-- Select a Tenant --</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="billType" class="block text-sm font-medium text-gray-700">Bill Type</label>
-                                <select id="billType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="Rent">Rent</option>
-                                    <option value="Rent & Garbage">Rent & Garbage</option>
-                                    <option value="Water">Water</option>
-                                    <option value="Maintenance">Maintenance</option>
-                                    <option value="Miscellaneous">Miscellaneous</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="billAmount" class="block text-sm font-medium text-gray-700">Amount (Ksh)</label>
-                                <input type="number" id="billAmount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 10000" required>
-                            </div>
-                            <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center justify-center hover:bg-blue-700 transition duration-200 shadow-md">
-                                ${icons.PlusCircle}
-                                <span class="ml-2">Create Bill</span>
-                            </button>
-                        </form>
-                    </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="rent" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Rent (Ksh)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="rent"
+                                            name="rent"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="Auto-filled"
+                                            readonly
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="lastWaterReading" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Last Water Reading
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="lastWaterReading"
+                                            name="lastWaterReading"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-100"
+                                            placeholder="e.g., 100"
+                                            readonly
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="currentWaterReading" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Current Water Reading
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="currentWaterReading"
+                                            name="currentWaterReading"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="e.g., 120"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="waterPricePerUnit" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Water Price per Unit (Ksh)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="waterPricePerUnit"
+                                            name="waterPricePerUnit"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            value="${WATER_PRICE_PER_UNIT}"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="waterAmount" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Water Amount (Calculated)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="waterAmount"
+                                            name="waterAmount"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100"
+                                            placeholder="Auto-calculated"
+                                            readonly
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="garbageAmount" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Garbage Amount (Ksh)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="garbageAmount"
+                                            name="garbageAmount"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="e.g., 300"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="otherPayments" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Other Payments (Ksh)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="otherPayments"
+                                            name="otherPayments"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="e.g., 200"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="paymentDeadline" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Payment Deadline
+                                        </label>
+                                        <input
+                                            type="date"
+                                            id="paymentDeadline"
+                                            name="paymentDeadline"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                                            required
+                                        />
+                                    </div>
+                                </div>
 
-                    <div id="billHistorySection">
-                        <div class="flex justify-between items-center mb-6">
-                            <h4 class="text-xl font-bold text-gray-700">Bill History</h4>
-                            <input type="month" id="billingHistoryMonthFilter" value="${billingHistoryFilterMonth}" class="px-4 py-2 border border-gray-300 rounded-lg">
-                        </div>
-                        <div id="generatedBillsList" class="space-y-4">
+                                <div class="mt-4 p-4 bg-blue-50 rounded-lg flex justify-between items-center">
+                                    <span class="text-lg font-semibold text-blue-800">Total Payment:</span>
+                                    <span id="totalPaymentDisplay" class="text-2xl font-bold text-blue-800">Ksh 0.00</span>
+                                </div>
+
+                                <button id="generateBillBtn"
+                                    class="w-full bg-purple-600 text-white py-3 rounded-lg flex items-center justify-center hover:bg-purple-700 transition duration-200 shadow-md mt-6">
+                                    ${icons.FileText} <span class="ml-2">Generate Bill & Save</span>
+                                </button>
                             </div>
+                        </div>
+
+                        <!-- Generated Bills History -->
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-700 mb-4">Generated Bills History</h4>
+                            <div class="mb-4 flex items-center space-x-3">
+                                <label for="billingHistoryFilterMonth" class="text-sm font-medium text-gray-700">Month:</label>
+                                <input type="month" id="billingHistoryFilterMonth" class="px-3 py-2 border rounded-lg bg-white">
+                                <button id="printAllReceiptsBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-indigo-700 transition duration-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer mr-2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14H3v7a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-7h-3"/><path d="M11 17H7"/><path d="M14 17H10"/></svg>
+                                    Print All This Month
+                                </button>
+                            </div>
+                            <div id="generatedBillsList" class="space-y-4 max-h-96 overflow-y-auto">
+                                ${bills.length === 0 ? `
+                                    <p class="text-gray-600 text-center py-8">No bills generated yet.</p>
+                                ` : ''}
+                            </div>
+                        </div>
                     </div>
                 </section>
             `;
-            // Add event listeners
-            document.getElementById('propertyFilterForBilling').addEventListener('change', (e) => {
+
+            // Attach event listeners for billing form
+            document.getElementById('filterPropertyBilling').addEventListener('change', (e) => {
                 selectedPropertyForBillingFilter = e.target.value;
-                updateGeneratedBillsList();
+                updateBillingTenantDropdown(); // Re-populate tenant dropdown based on property filter
+                updateGeneratedBillsList(); // Update history based on new filter
             });
+            document.getElementById('billingTenantSearchInput').value = billingTenantSearchQuery; // Set initial value
             document.getElementById('billingTenantSearchInput').addEventListener('input', (e) => {
                 billingTenantSearchQuery = e.target.value;
-                updateGeneratedBillsList();
+                updateBillingTenantDropdown(); // Re-populate tenant dropdown based on search query
             });
-            document.getElementById('billingHistoryMonthFilter').addEventListener('change', (e) => {
+            document.getElementById('selectTenant').addEventListener('change', populateBillFormForTenant);
+            document.getElementById('currentWaterReading').addEventListener('input', calculateWaterAmount);
+            document.getElementById('waterPricePerUnit').addEventListener('input', calculateWaterAmount);
+
+            const billFormElements = ['garbageAmount', 'otherPayments']; // Rent is auto-filled now
+            billFormElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', updateBillTotal);
+                }
+            });
+            document.getElementById('generateBillBtn').addEventListener('click', handleGenerateBill);
+
+            // History filter and print button
+            document.getElementById('billingHistoryFilterMonth').value = billingHistoryFilterMonth;
+            document.getElementById('billingHistoryFilterMonth').addEventListener('change', (e) => {
                 billingHistoryFilterMonth = e.target.value;
                 updateGeneratedBillsList();
             });
-            document.getElementById('billForm').addEventListener('submit', handleBillFormSubmit);
-            document.getElementById('tenantSelect').addEventListener('change', handleTenantSelectChange);
-            document.getElementById('bulkGenerateBtn').addEventListener('click', handleBulkBillGeneration);
-            updateBillingTenantDropdown();
-            updateGeneratedBillsList();
-        }
+            document.getElementById('printAllReceiptsBtn').addEventListener('click', downloadAllPdfReceiptsForCurrentMonth);
 
-        async function handleBulkBillGeneration() {
-            const bulkGenerateBtn = document.getElementById('bulkGenerateBtn');
-            const propertySelect = document.getElementById('bulkPropertySelect');
-            const selectedPropertyId = propertySelect.value;
-        
-            if (!selectedPropertyId) {
-                showModal("Error", "Please select a property to generate bills for.");
-                return;
-            }
-        
-            bulkGenerateBtn.disabled = true;
-            bulkGenerateBtn.innerHTML = `<div class="loading-spinner h-5 w-5 border-2 rounded-full border-b-2 border-white animate-spin"></div><span class="ml-2">Generating...</span>`;
-        
-            try {
-                const tenantsToBill = tenants.filter(t => t.propertyId === selectedPropertyId);
-        
-                if (tenantsToBill.length === 0) {
-                    showModal("Info", "There are no tenants in the selected property to generate bills for.");
-                    return;
-                }
-        
-                // Get current date for bill creation
-                const today = new Date();
-                const billDate = today.toISOString().substring(0, 10); // YYYY-MM-DD
-                const billingMonth = today.toISOString().substring(0, 7); // YYYY-MM
-        
-                const billPromises = tenantsToBill.map(tenant => {
-                    // Check if a bill for this tenant for this month already exists
-                    const existingBill = bills.find(b => b.tenantId === tenant.id && b.billingMonth === billingMonth);
-                    if (existingBill) {
-                        console.log(`Skipping bill for ${tenant.name} as one already exists for this month.`);
-                        return Promise.resolve(); // Resolve immediately for existing bills
-                    }
-
-                    // Create the new bill object
-                    const newBill = {
-                        tenantId: tenant.id,
-                        billType: 'Rent + Garbage',
-                        rent: tenant.amountCharged,
-                        water: 0,
-                        garbage: tenant.garbageFee,
-                        maintenance: 0,
-                        miscellaneous: 0,
-                        totalAmount: tenant.amountCharged + (tenant.garbageFee || 0),
-                        date: billDate,
-                        createdAt: new Date().toISOString(),
-                        status: 'Unpaid',
-                        tenantName: tenant.name,
-                        houseNumber: tenant.houseNumber,
-                        propertyName: tenant.propertyName,
-                        billingMonth: billingMonth,
-                    };
-                    return addDoc(billCollectionRef, newBill);
-                });
-        
-                await Promise.all(billPromises);
-                showModal("Success", `Successfully generated standard bills for ${tenantsToBill.length} tenants in the selected property.`);
-            } catch (error) {
-                console.error("Error generating bulk bills:", error);
-                showModal("Error", `Failed to generate bulk bills: ${error.message}`);
-            } finally {
-                bulkGenerateBtn.disabled = false;
-                bulkGenerateBtn.innerHTML = `${icons.PlusCircle}<span class="ml-2">Generate Bills</span>`;
-            }
+            // Initial population and list update
+            updateBillingTenantDropdown(); // Populate tenant dropdown initially
+            populateBillFormForTenant(); // Populate based on initial filter or no filter
+            updateGeneratedBillsList(); // Initial render of bills
         }
 
         function updateBillingTenantDropdown() {
-            const tenantSelectEl = document.getElementById('tenantSelect');
-            if (!tenantSelectEl) return;
-            tenantSelectEl.innerHTML = `<option value="">-- Select a Tenant --</option>` + tenants.map(t => `<option value="${t.id}">${t.name} (${t.houseNumber})</option>`).join('');
-        }
+            const selectTenantDropdown = document.getElementById('selectTenant');
+            if (!selectTenantDropdown) return;
 
-        async function handleBillFormSubmit(e) {
-            e.preventDefault();
-            const tenantId = document.getElementById('tenantSelect').value;
-            const billType = document.getElementById('billType').value;
-            const billAmount = parseFloat(document.getElementById('billAmount').value);
-        
-            if (!tenantId || isNaN(billAmount)) {
-                showModal("Error", "Please select a tenant and enter a valid amount.");
-                return;
+            let filteredTenants = tenants;
+
+            // Filter by property
+            if (selectedPropertyForBillingFilter) {
+                filteredTenants = filteredTenants.filter(t => t.propertyId === selectedPropertyForBillingFilter);
             }
-        
-            const selectedTenant = tenants.find(t => t.id === tenantId);
-            const selectedProperty = properties.find(p => p.id === selectedTenant.propertyId);
-        
-            const newBill = {
-                tenantId: tenantId,
-                billType: billType,
-                rent: 0,
-                water: 0,
-                garbage: 0,
-                maintenance: 0,
-                miscellaneous: 0,
-                totalAmount: billAmount,
-                date: new Date().toISOString().substring(0, 10),
-                createdAt: new Date().toISOString(),
-                status: 'Unpaid',
-                tenantName: selectedTenant.name,
-                houseNumber: selectedTenant.houseNumber,
-                propertyName: selectedProperty.name,
-                billingMonth: new Date().toISOString().substring(0, 7)
-            };
-        
-            // Assign amount to correct field
-            if (billType === 'Rent' || billType === 'Rent & Garbage') {
-                newBill.rent = billAmount;
-                newBill.garbage = billType === 'Rent & Garbage' ? (selectedTenant.garbageFee || 0) : 0;
-                newBill.totalAmount = newBill.rent + newBill.garbage;
-            } else if (billType === 'Water') {
-                newBill.water = billAmount;
-            } else if (billType === 'Garbage') {
-                newBill.garbage = billAmount;
-            } else if (billType === 'Maintenance') {
-                newBill.maintenance = billAmount;
-            } else if (billType === 'Miscellaneous') {
-                newBill.miscellaneous = billAmount;
+
+            // Filter by search query
+            const query = billingTenantSearchQuery.toLowerCase();
+            if (query) {
+                filteredTenants = filteredTenants.filter(tenant =>
+                    tenant.name.toLowerCase().includes(query) ||
+                    tenant.houseNumber.toLowerCase().includes(query)
+                );
             }
-        
-            try {
-                await addDoc(billCollectionRef, newBill);
-                showModal("Success", `New bill for ${selectedTenant.name} created successfully.`);
-                document.getElementById('billForm').reset();
-            } catch (e) {
-                console.error("Error adding bill: ", e);
-                showModal("Error", "Failed to create bill. Please try again.");
-            }
-        }
-        
-        function handleTenantSelectChange(e) {
-            const tenantId = e.target.value;
-            const billAmountInput = document.getElementById('billAmount');
-            if (tenantId) {
-                const selectedTenant = tenants.find(t => t.id === tenantId);
-                if (selectedTenant) {
-                    billAmountInput.value = selectedTenant.amountCharged;
+
+            let optionsHtml = '<option value="">-- Select a Tenant --</option>';
+
+            // Group tenants by property for optgroup
+            const groupedTenants = properties.reduce((acc, property) => {
+                const tenantsInProperty = filteredTenants.filter(t => t.propertyId === property.id);
+                if (tenantsInProperty.length > 0) {
+                    acc[property.name] = tenantsInProperty;
                 }
-            } else {
-                billAmountInput.value = '';
+                return acc;
+            }, {});
+
+            for (const propertyName in groupedTenants) {
+                optionsHtml += `<optgroup label="${propertyName}">`;
+                groupedTenants[propertyName].forEach(tenant => {
+                    optionsHtml += `<option value="${tenant.id}">${tenant.name} (House No: ${tenant.houseNumber})</option>`;
+                });
+                optionsHtml += `</optgroup>`;
             }
+
+            selectTenantDropdown.innerHTML = optionsHtml;
+
+            // After updating the dropdown, ensure the form fields are correctly populated/cleared
+            populateBillFormForTenant();
         }
 
+        function populateBillFormForTenant() {
+            const selectedTenantId = document.getElementById('selectTenant').value;
+            const selectedTenant = tenants.find(t => t.id === selectedTenantId);
+
+            const rentInput = document.getElementById('rent');
+            const lastWaterReadingInput = document.getElementById('lastWaterReading');
+            const currentWaterReadingInput = document.getElementById('currentWaterReading');
+            const waterAmountInput = document.getElementById('waterAmount');
+            const garbageAmountInput = document.getElementById('garbageAmount');
+            const otherPaymentsInput = document.getElementById('otherPayments');
+            const paymentDeadlineInput = document.getElementById('paymentDeadline');
+            const totalPaymentDisplay = document.getElementById('totalPaymentDisplay');
+
+            if (selectedTenant) {
+                if (rentInput) rentInput.value = selectedTenant.amountCharged || '';
+                if (lastWaterReadingInput) lastWaterReadingInput.value = selectedTenant.lastWaterReading || 0;
+                if (currentWaterReadingInput) currentWaterReadingInput.value = ''; // Clear current reading for new input
+                if (waterAmountInput) waterAmountInput.value = ''; // Clear calculated water amount
+                if (garbageAmountInput) garbageAmountInput.value = ''; // Clear for new bill
+                if (otherPaymentsInput) otherPaymentsInput.value = ''; // Clear for new bill
+                if (paymentDeadlineInput) paymentDeadlineInput.value = ''; // Clear for new bill
+                updateBillTotal(); // Recalculate total after populating rent
+            } else {
+                // Clear all fields if no tenant is selected
+                if (rentInput) rentInput.value = '';
+                if (lastWaterReadingInput) lastWaterReadingInput.value = '';
+                if (currentWaterReadingInput) currentWaterReadingInput.value = '';
+                if (waterAmountInput) waterAmountInput.value = '';
+                if (garbageAmountInput) garbageAmountInput.value = '';
+                if (otherPaymentsInput) otherPaymentsInput.value = '';
+                if (paymentDeadlineInput) paymentDeadlineInput.value = '';
+                if (totalPaymentDisplay) totalPaymentDisplay.textContent = 'Ksh 0.00';
+            }
+            calculateWaterAmount(); // Ensure water amount is calculated after tenant selection
+        }
+
+        function calculateWaterAmount() {
+            const lastReading = parseFloat(document.getElementById('lastWaterReading')?.value) || 0;
+            const currentReading = parseFloat(document.getElementById('currentWaterReading')?.value) || 0;
+            const pricePerUnit = parseFloat(document.getElementById('waterPricePerUnit')?.value) || 0;
+            const waterAmountInput = document.getElementById('waterAmount');
+
+            let waterUnits = 0;
+            if (currentReading >= lastReading) {
+                waterUnits = currentReading - lastReading;
+            } else {
+                // Handle case where current reading is less than last reading (e.g., meter reset)
+                waterUnits = 0;
+            }
+
+            const waterAmount = waterUnits * pricePerUnit;
+            if (waterAmountInput) {
+                waterAmountInput.value = waterAmount.toFixed(2);
+            }
+            updateBillTotal(); // Recalculate total after water amount changes
+        }
+
+        function updateBillTotal() {
+            const rent = parseFloat(document.getElementById('rent')?.value) || 0;
+            const waterAmount = parseFloat(document.getElementById('waterAmount')?.value) || 0;
+            const garbageAmount = parseFloat(document.getElementById('garbageAmount')?.value) || 0;
+            const otherPayments = parseFloat(document.getElementById('otherPayments')?.value) || 0;
+            const total = rent + waterAmount + garbageAmount + otherPayments;
+            const totalPaymentDisplay = document.getElementById('totalPaymentDisplay');
+            if (totalPaymentDisplay) {
+                totalPaymentDisplay.textContent = `Ksh ${total.toFixed(2)}`;
+            }
+        }
 
         function updateGeneratedBillsList() {
-            const billsListEl = document.getElementById('generatedBillsList');
-            if (!billsListEl) return;
-            
-            // Apply all filters
+            const generatedBillsListDiv = document.getElementById('generatedBillsList');
+            if (!generatedBillsListDiv) return;
+
+            // Filter bills by selected property and selected month
             const filteredBills = bills.filter(bill => {
-                const tenant = tenants.find(t => t.id === bill.tenantId);
-                const propertyMatch = !selectedPropertyForBillingFilter || (tenant && tenant.propertyId === selectedPropertyForBillingFilter);
-                const tenantSearchMatch = !billingTenantSearchQuery || (bill.tenantName.toLowerCase().includes(billingTenantSearchQuery.toLowerCase()) || bill.houseNumber.toLowerCase().includes(billingTenantSearchQuery.toLowerCase()));
-                const monthMatch = bill.billingMonth === billingHistoryFilterMonth;
-                return propertyMatch && tenantSearchMatch && monthMatch;
+                const billMonth = bill.billDate.substring(0, 7); // YYYY-MM
+                const matchesMonth = (billingHistoryFilterMonth === '' || billMonth === billingHistoryFilterMonth);
+                
+                // Ensure propertyNameId exists before filtering
+                const matchesProperty = (selectedPropertyForBillingFilter === '' || bill.propertyNameId === selectedPropertyForBillingFilter);
+
+                return matchesMonth && matchesProperty;
             });
 
             if (filteredBills.length === 0) {
-                billsListEl.innerHTML = `<p class="text-gray-600 text-center py-8">No bills found for the selected filters.</p>`;
+                generatedBillsListDiv.innerHTML = `<p class="text-gray-600 text-center py-8">No bills generated for this selection yet.</p>`;
                 return;
             }
 
-            billsListEl.innerHTML = `
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg shadow-sm">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Tenant</th>
-                                <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property</th>
-                                <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            ${filteredBills.map(bill => `
-                                <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${bill.tenantName} (${bill.houseNumber})</td>
-                                    <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${bill.propertyName}</td>
-                                    <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${bill.billType}</td>
-                                    <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">Ksh ${bill.totalAmount.toFixed(2)}</td>
-                                    <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${bill.date}</td>
-                                    <td class="py-3 px-4 whitespace-nowrap text-sm">
-                                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${bill.status === 'Paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                            ${bill.status}
-                                        </span>
-                                    </td>
-                                    <td class="py-3 px-4 whitespace-nowrap text-sm">
-                                        <div class="flex space-x-2">
-                                            <button data-bill-id="${bill.id}" data-tenant-id="${bill.tenantId}" class="view-receipt-btn text-blue-600 hover:text-blue-800 transition duration-200" title="View Receipt">
-                                                ${icons.FileText}
-                                            </button>
-                                            <button data-bill-id="${bill.id}" data-tenant-id="${bill.tenantId}" class="download-receipt-btn text-blue-600 hover:text-blue-800 transition duration-200" title="Download Receipt">
-                                                ${icons.Download}
-                                            </button>
-                                            <button data-bill-id="${bill.id}" class="delete-bill-btn text-red-600 hover:text-red-800 transition duration-200" title="Delete Bill">
-                                                ${icons.Trash2}
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+            generatedBillsListDiv.innerHTML = filteredBills.map(bill => `
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="font-semibold text-gray-800">${bill.tenantName} - ${bill.propertyName} (House ${bill.houseNumber})</p>
+                        <span class="text-sm text-gray-600">${new Date(bill.billDate).toLocaleDateString('en-KE')}</span>
+                    </div>
+                    <p class="text-sm text-gray-700">Total: <span class="font-bold text-blue-700">Ksh ${bill.totalPayment.toFixed(2)}</span></p>
+                    <p class="text-sm text-gray-700">Deadline: ${new Date(bill.paymentDeadline).toLocaleDateString('en-KE')}</p>
+                    <div class="mt-3 flex justify-end">
+                        <button data-bill-id="${bill.id}"
+                            class="view-receipt-btn bg-green-500 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-green-600 transition duration-200">
+                            ${icons.FileText} <span class="ml-2">View/Download Receipt</span>
+                        </button>
+                    </div>
                 </div>
-            `;
-            // Add event listeners for new buttons
-            document.querySelectorAll('.view-receipt-btn').forEach(btn => btn.addEventListener('click', (e) => showReceiptModal(e.currentTarget.dataset.billId)));
-            document.querySelectorAll('.download-receipt-btn').forEach(btn => btn.addEventListener('click', (e) => generatePDF(e.currentTarget.dataset.billId)));
-            document.querySelectorAll('.delete-bill-btn').forEach(btn => btn.addEventListener('click', (e) => {
-                const billId = e.currentTarget.dataset.billId;
-                showModal("Confirm Delete", "Are you sure you want to delete this bill? This action is irreversible.", "confirm", () => deleteBill(billId));
-            }));
+            `).join('');
+
+            generatedBillsListDiv.querySelectorAll('.view-receipt-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const billId = e.currentTarget.dataset.billId;
+                    const selectedBill = bills.find(b => b.id === billId);
+                    if (selectedBill) generatePdfReceipt(selectedBill);
+                });
+            });
         }
-        
-        // Render Finance Section
+
         function renderFinancialSection(parentEl) {
-            const totalRent = bills.reduce((sum, bill) => sum + (bill.billType.includes('Rent') ? bill.rent : 0), 0);
-            const totalWater = bills.reduce((sum, bill) => sum + (bill.water || 0), 0);
-            const totalGarbage = bills.reduce((sum, bill) => sum + (bill.garbage || 0), 0);
-            const totalMaintenance = bills.reduce((sum, bill) => sum + (bill.maintenance || 0), 0);
-            const totalMiscellaneous = bills.reduce((sum, bill) => sum + (bill.miscellaneous || 0), 0);
-            const totalBilled = totalRent + totalWater + totalGarbage + totalMaintenance + totalMiscellaneous;
-            const totalPaid = payments.reduce((sum, payment) => sum + payment.amount, 0);
-            const totalOutstanding = totalBilled - totalPaid;
-            
+            const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
+
+            // Filter bills and payments based on selected property
+            const filteredBillsForFinance = selectedPropertyForFinanceFilter
+                ? bills.filter(bill => bill.propertyNameId === selectedPropertyForFinanceFilter)
+                : bills;
+
+            const filteredPaymentsForFinance = selectedPropertyForFinanceFilter
+                ? payments.filter(payment => {
+                    const tenant = tenants.find(t => t.id === payment.tenantId);
+                    return tenant && tenant.propertyId === selectedPropertyForFinanceFilter;
+                })
+                : payments;
+
+            const filteredTenantsForFinance = selectedPropertyForFinanceFilter
+                ? tenants.filter(tenant => tenant.propertyId === selectedPropertyForFinanceFilter)
+                : tenants;
+
+
+            const billsThisMonth = filteredBillsForFinance.filter(bill => bill.billDate.substring(0, 7) === currentMonth);
+            const totalBilledThisMonth = billsThisMonth.reduce((sum, bill) => sum + bill.totalPayment, 0);
+
+            const paymentsThisMonth = filteredPaymentsForFinance.filter(payment => payment.paymentDate.substring(0, 7) === currentMonth);
+            const totalPaidThisMonth = paymentsThisMonth.reduce((sum, payment) => sum + payment.amountPaid, 0);
+
+            const outstandingBalanceThisMonth = totalBilledThisMonth - totalPaidThisMonth;
+
+            const overallOutstandingBalance = filteredTenantsForFinance.reduce((sum, tenant) => sum + tenant.outstandingBalance, 0);
+
+
             parentEl.innerHTML = `
                 <section class="bg-white rounded-xl shadow-md p-6 mb-8">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Financial Overview</h3>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Financial Overview (Current Month: ${new Date().toLocaleString('en-KE', { month: 'long', year: 'numeric' })})</h3>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                        ${renderFinanceCard(icons.Receipt, "Total Billed", totalBilled, "Ksh")}
-                        ${renderFinanceCard(icons.Wallet, "Total Paid", totalPaid, "Ksh")}
-                        ${renderFinanceCard(icons.DollarSign, "Outstanding Amount", totalOutstanding, "Ksh", totalOutstanding > 0 ? 'text-red-600' : 'text-green-600')}
+                    <div class="mb-4">
+                        <label for="filterPropertyFinance" class="block text-sm font-medium text-gray-700 mb-1">
+                            Filter by Property
+                        </label>
+                        <select
+                            id="filterPropertyFinance"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        >
+                            <option value="">All Properties</option>
+                            ${properties.map(property => `
+                                <option value="${property.id}" ${selectedPropertyForFinanceFilter === property.id ? 'selected' : ''}>
+                                    ${property.name}
+                                </option>
+                            `).join('')}
+                        </select>
                     </div>
 
-                    <div class="space-y-6">
-                        <div>
-                            <h4 class="text-xl font-bold text-gray-700 mb-4">Summary by Category</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                ${renderCategoryCard("Rent Billed", totalRent, "Ksh")}
-                                ${renderCategoryCard("Water Billed", totalWater, "Ksh")}
-                                ${renderCategoryCard("Garbage Billed", totalGarbage, "Ksh")}
-                                ${renderCategoryCard("Maintenance Billed", totalMaintenance, "Ksh")}
-                                ${renderCategoryCard("Miscellaneous Billed", totalMiscellaneous, "Ksh")}
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-blue-50 p-6 rounded-xl shadow-sm border border-blue-200">
+                            <p class="text-blue-700 text-sm font-medium">Total Billed This Month</p>
+                            <h3 class="text-3xl font-bold text-blue-900">Ksh ${totalBilledThisMonth.toFixed(2)}</h3>
                         </div>
+                        <div class="bg-green-50 p-6 rounded-xl shadow-sm border border-green-200">
+                            <p class="text-green-700 text-sm font-medium">Total Paid This Month</p>
+                            <h3 class="text-3xl font-bold text-green-900">Ksh ${totalPaidThisMonth.toFixed(2)}</h3>
+                        </div>
+                        <div class="bg-yellow-50 p-6 rounded-xl shadow-sm border border-yellow-200">
+                            <p class="text-yellow-700 text-sm font-medium">Net Outstanding This Month</p>
+                            <h3 class="text-3xl font-bold text-yellow-900">Ksh ${outstandingBalanceThisMonth.toFixed(2)}</h3>
+                        </div>
+                    </div>
 
-                        <div>
-                            <h4 class="text-xl font-bold text-gray-700 mb-4">Tenant Balances</h4>
-                            <div class="relative mb-4">
-                                <input type="text" id="financeTenantSearchInput" placeholder="Search tenants by name..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" value="">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    ${icons.Search}
-                                </div>
-                            </div>
-                            <div id="tenantBalancesList" class="space-y-2">
-                                </div>
-                        </div>
+                    <div class="bg-purple-50 p-6 rounded-xl shadow-sm border border-purple-200">
+                        <p class="text-purple-700 text-sm font-medium">Overall Outstanding Balance (All Tenants in Filter)</p>
+                        <h3 class="text-3xl font-bold text-purple-900">Ksh ${overallOutstandingBalance.toFixed(2)}</h3>
+                    </div>
+
+                    <h4 class="text-xl font-semibold text-gray-700 mt-8 mb-4">Recent Payments (Filtered)</h4>
+                    <div class="overflow-x-auto max-h-60 overflow-y-auto">
+                        <table class="min-w-full bg-white rounded-lg shadow-sm">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenant</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount Paid</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">New Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                ${filteredPaymentsForFinance.length === 0 ? `
+                                    <tr><td colspan="5" class="py-3 px-4 text-center text-gray-600">No payments recorded yet for this selection.</td></tr>
+                                ` : filteredPaymentsForFinance.slice(0, 10).map(payment => `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="py-3 px-4 text-sm text-gray-800">${tenants.find(t => t.id === payment.tenantId)?.name || 'N/A'}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">Ksh ${payment.amountPaid.toFixed(2)}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${new Date(payment.paymentDate).toLocaleDateString('en-KE')}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${payment.type}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">Ksh ${payment.newBalance.toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 </section>
             `;
-            updateTenantBalancesList();
-            document.getElementById('financeTenantSearchInput').addEventListener('input', updateTenantBalancesList);
+
+            // Add event listener for the new finance property filter
+            document.getElementById('filterPropertyFinance').addEventListener('change', (e) => {
+                selectedPropertyForFinanceFilter = e.target.value;
+                renderDashboardPage(); // Re-render the entire dashboard to update the finance section
+            });
         }
 
-        function renderFinanceCard(icon, title, value, unit, colorClass = 'text-gray-900') {
-            return `
-                <div class="bg-blue-50 p-6 rounded-xl shadow-inner flex items-center space-x-4">
-                    <div class="p-3 bg-blue-100 text-blue-600 rounded-full">
-                        ${icon}
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-gray-500">${title}</p>
-                        <h3 class="text-2xl font-bold ${colorClass}">${unit} ${value.toFixed(2)}</h3>
-                    </div>
-                </div>
-            `;
-        }
 
-        function renderCategoryCard(title, value, unit) {
-            return `
-                <div class="bg-gray-100 p-4 rounded-lg shadow-sm">
-                    <p class="text-sm font-medium text-gray-600">${title}</p>
-                    <p class="text-lg font-semibold text-gray-800 mt-1">${unit} ${value.toFixed(2)}</p>
-                </div>
-            `;
-        }
-
-        function updateTenantBalancesList() {
-            const tenantBalancesListEl = document.getElementById('tenantBalancesList');
-            if (!tenantBalancesListEl) return;
-            const searchQuery = document.getElementById('financeTenantSearchInput').value.toLowerCase();
-            
-            const tenantData = tenants.map(tenant => {
-                const totalBilled = bills.filter(bill => bill.tenantId === tenant.id).reduce((sum, bill) => sum + (bill.totalAmount || 0), 0);
-                const totalPaid = payments.filter(payment => payment.tenantId === tenant.id).reduce((sum, payment) => sum + (payment.amount || 0), 0);
-                const outstandingBalance = totalBilled - totalPaid;
-
-                return {
-                    ...tenant,
-                    totalBilled,
-                    totalPaid,
-                    outstandingBalance,
-                };
-            }).filter(t => t.name.toLowerCase().includes(searchQuery) || t.houseNumber.toLowerCase().includes(searchQuery));
-            
-            if (tenantData.length === 0) {
-                 tenantBalancesListEl.innerHTML = `<p class="text-gray-600 text-center py-8">No tenants found matching the search criteria.</p>`;
-                 return;
-            }
-
-            tenantBalancesListEl.innerHTML = tenantData.map(tenant => {
-                const balanceClass = tenant.outstandingBalance > 0 ? 'text-red-600' : 'text-green-600';
-                return `
-                    <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm">
-                        <div class="flex-1 min-w-0">
-                            <p class="text-lg font-medium text-gray-900">${tenant.name} <span class="text-gray-500 text-sm">(${tenant.houseNumber})</span></p>
-                            <p class="text-sm text-gray-500">${tenant.propertyName}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm font-semibold text-gray-700">Total Billed: <span class="font-normal text-gray-600">Ksh ${tenant.totalBilled.toFixed(2)}</span></p>
-                            <p class="text-sm font-semibold text-gray-700">Total Paid: <span class="font-normal text-gray-600">Ksh ${tenant.totalPaid.toFixed(2)}</span></p>
-                            <p class="text-lg font-bold ${balanceClass}">Balance: Ksh ${tenant.outstandingBalance.toFixed(2)}</p>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Action Handlers
+        // Event Handlers (CRUD and Auth)
         async function handleLoginSubmit(e) {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errorEl = document.getElementById('loginError');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const loginError = document.getElementById('loginError');
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            loginError.classList.add('hidden'); // Hide previous errors
 
             try {
-                // Ensure auth is defined before calling its methods
-                if (!auth) {
-                    throw new Error("Firebase Auth service is not available.");
+                if (email === '' && password === '') {
+                    // Anonymous sign-in for demo
+                    await signInAnonymously(auth);
+                    showModal("Demo Login", "You are signed in anonymously for a demo experience. Your data will be saved uniquely.");
+                } else {
+                    // Attempt to sign in with email and password
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showModal("Login Successful", "Welcome back!");
                 }
-
-                await signInWithEmailAndPassword(auth, email, password);
-                // The onAuthStateChanged listener will handle the page redirect on success
             } catch (error) {
-                console.error("Login failed:", error);
-                let message = "Login failed. Please check your email and password.";
-                if (error.code === 'auth/invalid-credential') {
-                    message = "Invalid email or password. Please try again.";
-                } else if (error.code === 'auth/network-request-failed') {
-                    message = "Network error. Please check your internet connection.";
-                } else if (error.code === 'auth/too-many-requests') {
-                    message = "Too many failed login attempts. Please try again later.";
+                console.error("Firebase Auth Error:", error);
+                let errorMessage = "An unknown error occurred. Please try again.";
+                switch (error.code) {
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address format.';
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = 'This user account has been disabled.';
+                        break;
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = 'Invalid credentials. If you are a new user, entering an email and password will create an account.';
+                        break;
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'This email is already in use. Please log in or use a different email.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password is too weak. Please use a stronger password (at least 6 characters).';
+                        break;
+                    default:
+                        errorMessage = `Authentication failed: ${error.message}`;
                 }
-                errorEl.textContent = message;
-                errorEl.style.display = 'block';
+                loginError.textContent = errorMessage;
+                loginError.classList.remove('hidden');
             }
         }
 
         async function handleLogout() {
             try {
-                if (auth) {
-                    await auth.signOut();
-                }
-                // The onAuthStateChanged listener will handle the page redirect on success
+                await auth.signOut();
+                showModal("Logged Out", "You have been successfully logged out.");
             } catch (error) {
-                console.error("Logout failed:", error);
-                showModal("Logout Error", "Failed to log out. Please try again.");
+                console.error("Error logging out:", error);
+                showModal("Logout Error", `Failed to log out: ${error.message}`);
             }
         }
 
-        async function showAddPropertyModal() {
-            const formHtml = `
-                <form id="addPropertyForm" class="space-y-4">
-                    <div>
-                        <label for="propertyName" class="block text-sm font-medium text-gray-700">Property Name</label>
-                        <input type="text" id="propertyName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="e.g., Spring Valley Apartments" required>
-                    </div>
-                    <div>
-                        <label for="propertyLocation" class="block text-sm font-medium text-gray-700">Location</label>
-                        <input type="text" id="propertyLocation" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="e.g., Kilimani" required>
-                    </div>
-                    <div>
-                        <label for="propertyUnits" class="block text-sm font-medium text-gray-700">Number of Units</label>
-                        <input type="number" id="propertyUnits" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="e.g., 20" required min="1">
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200">Add Property</button>
-                </form>
-            `;
+        async function handleAddProperty(propertyName) {
+            try {
+                const newProperty = {
+                    name: propertyName,
+                    createdAt: new Date().toISOString(),
+                };
+                await addDoc(propertyCollectionRef, newProperty);
+                showModal("Success", `Property "${propertyName}" added successfully!`);
+            } catch (error) {
+                console.error("Error adding property:", error);
+                showModal("Error", `Failed to add property: ${e.message}`);
+            }
+        }
 
-            showModal("Add New Property", formHtml);
+        async function handleDeleteProperty(propertyId) {
+            showModal("Confirm Deletion", "Are you sure you want to delete this property and all its associated tenants, bills, and payments?", 'confirm', async () => {
+                try {
+                    // Delete property document
+                    await deleteDoc(doc(propertyCollectionRef, propertyId));
 
-            document.getElementById('addPropertyForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const propertyName = document.getElementById('propertyName').value;
-                const propertyLocation = document.getElementById('propertyLocation').value;
-                const propertyUnits = parseInt(document.getElementById('propertyUnits').value, 10);
-                
-                if (isNaN(propertyUnits) || propertyUnits < 1) {
-                    showModal("Error", "Please enter a valid number of units.");
+                    // Delete associated tenants
+                    const tenantsToDelete = tenants.filter(t => t.propertyId === propertyId);
+                    for (const tenant of tenantsToDelete) {
+                        await deleteDoc(doc(tenantCollectionRef, tenant.id));
+                    }
+
+                    // Delete associated bills
+                    const billsToDelete = bills.filter(b => tenantsToDelete.some(t => t.id === b.tenantId));
+                    for (const bill of billsToDelete) {
+                        await deleteDoc(doc(billCollectionRef, bill.id));
+                    }
+
+                    // Delete associated payments
+                    const paymentsToDelete = payments.filter(p => tenantsToDelete.some(t => t.id === p.tenantId));
+                    for (const payment of paymentsToDelete) {
+                        await deleteDoc(doc(paymentCollectionRef, payment.id));
+                    }
+
+                    showModal("Success", "Property and associated data deleted successfully!");
+                } catch (error) {
+                    console.error("Error deleting property and associated data:", error);
+                    showModal("Error", `Failed to delete property: ${error.message}`);
+                }
+            });
+        }
+
+        async function handleSaveTenant(tenantData, editingTenant) {
+            try {
+                const tenantToSave = {
+                    ...tenantData,
+                    amountCharged: parseFloat(tenantData.amountCharged), // Ensure amount is a number
+                    lastWaterReading: parseFloat(tenantData.lastWaterReading) || 0, // Ensure it's a number
+                    updatedAt: new Date().toISOString(),
+                };
+
+                if (editingTenant) {
+                    // Update existing tenant
+                    await setDoc(doc(tenantCollectionRef, editingTenant.id), tenantToSave);
+                    showModal("Success", "Tenant updated successfully!");
+                } else {
+                    // Add new tenant
+                    tenantToSave.createdAt = new Date().toISOString();
+                    tenantToSave.outstandingBalance = 0; // New tenants start with 0 balance
+                    await addDoc(tenantCollectionRef, tenantToSave);
+                    showModal("Success", "Tenant added successfully!");
+                }
+            } catch (error) {
+                console.error("Error saving tenant:", error);
+                showModal("Error", `Failed to save tenant: ${error.message}`);
+            }
+        }
+
+        async function handleDeleteTenant(tenantId) {
+            showModal("Confirm Deletion", "Are you sure you want to delete this tenant and their associated bills/payments?", 'confirm', async () => {
+                try {
+                    await deleteDoc(doc(tenantCollectionRef, tenantId));
+
+                    // Delete associated bills
+                    const billsToDelete = bills.filter(b => b.tenantId === tenantId);
+                    for (const bill of billsToDelete) {
+                        await deleteDoc(doc(billCollectionRef, bill.id));
+                    }
+
+                    // Delete associated payments
+                    const paymentsToDelete = payments.filter(p => p.tenantId === tenantId);
+                    for (const payment of paymentsToDelete) {
+                        await deleteDoc(doc(paymentCollectionRef, payment.id));
+                    }
+
+                    showModal("Success", "Tenant and associated data deleted successfully!");
+                } catch (error) {
+                    console.error("Error deleting tenant and associated data:", error);
+                    showModal("Error", `Failed to delete tenant: ${error.message}`);
+                }
+            });
+        }
+
+        async function handleRecordPayment(tenantId, amountPaid, paymentDate) {
+            try {
+                const tenantDocRef = doc(tenantCollectionRef, tenantId);
+                const tenantSnap = await getDoc(tenantDocRef);
+
+                if (!tenantSnap.exists()) {
+                    showModal("Error", "Tenant not found for payment.");
                     return;
                 }
 
-                const newProperty = {
-                    name: propertyName,
-                    location: propertyLocation,
-                    units: propertyUnits
-                };
+                const tenant = tenantSnap.data();
+                const newBalance = Math.max(0, tenant.outstandingBalance - amountPaid); // Balance cannot go below 0
 
-                try {
-                    await addDoc(propertyCollectionRef, newProperty);
-                    showModal("Success", "Property added successfully!");
-                } catch (e) {
-                    console.error("Error adding property: ", e);
-                    showModal("Error", "Failed to add property. Please try again.");
-                }
-            });
-        }
+                const paymentType = amountPaid >= tenant.outstandingBalance ? 'Full' : 'Partial';
 
-        async function deleteProperty(propertyId) {
-            try {
-                // Delete property document
-                await deleteDoc(doc(db, `artifacts/default-app-id/users/${userId}/properties`, propertyId));
-                
-                // Get and delete all tenants associated with the property
-                const qTenants = query(tenantCollectionRef, where("propertyId", "==", propertyId));
-                const tenantSnapshot = await getDocs(qTenants);
-                const tenantDeletePromises = tenantSnapshot.docs.map(tDoc => deleteDoc(doc(db, `artifacts/default-app-id/users/${userId}/tenants`, tDoc.id)));
-                
-                // Get and delete all bills associated with the property
-                const qBills = query(billCollectionRef, where("propertyId", "==", propertyId));
-                const billSnapshot = await getDocs(qBills);
-                const billDeletePromises = billSnapshot.docs.map(bDoc => deleteDoc(doc(db, `artifacts/default-app-id/users/${userId}/bills`, bDoc.id)));
-                
-                // Get and delete all payments associated with the property
-                const qPayments = query(paymentCollectionRef, where("propertyId", "==", propertyId));
-                const paymentSnapshot = await getDocs(qPayments);
-                const paymentDeletePromises = paymentSnapshot.docs.map(pDoc => deleteDoc(doc(db, `artifacts/default-app-id/users/${userId}/payments`, pDoc.id)));
-                
-                // Execute all deletion promises in parallel
-                await Promise.all([...tenantDeletePromises, ...billDeletePromises, ...paymentDeletePromises]);
-
-                showModal("Success", "Property and all associated data deleted successfully!");
-            } catch (e) {
-                console.error("Error deleting property: ", e);
-                showModal("Error", "Failed to delete property. Please try again.");
-            }
-        }
-
-        async function showAddTenantModal(propertyId) {
-            const formHtml = `
-                <form id="addTenantForm" class="space-y-4">
-                    <input type="hidden" id="tenantPropertyId" value="${propertyId}">
-                    <div>
-                        <label for="tenantName" class="block text-sm font-medium text-gray-700">Tenant Name</label>
-                        <input type="text" id="tenantName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
-                    </div>
-                    <div>
-                        <label for="houseNumber" class="block text-sm font-medium text-gray-700">House Number/Unit</label>
-                        <input type="text" id="houseNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
-                    </div>
-                    <div>
-                        <label for="houseType" class="block text-sm font-medium text-gray-700">House Type</label>
-                        <select id="houseType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
-                            ${houseTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div>
-                        <label for="amountCharged" class="block text-sm font-medium text-gray-700">Monthly Rent (Ksh)</label>
-                        <input type="number" id="amountCharged" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required min="0">
-                    </div>
-                    <div>
-                        <label for="garbageFee" class="block text-sm font-medium text-gray-700">Monthly Garbage Fee (Ksh)</label>
-                        <input type="number" id="garbageFee" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" value="300" min="0">
-                    </div>
-                    <div>
-                        <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                        <input type="tel" id="phoneNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                    </div>
-                    <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition duration-200">Add Tenant</button>
-                </form>
-            `;
-            const property = properties.find(p => p.id === propertyId);
-            showModal(`Add Tenant to ${property.name}`, formHtml);
-
-            document.getElementById('addTenantForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const newTenant = {
-                    name: document.getElementById('tenantName').value,
-                    houseNumber: document.getElementById('houseNumber').value,
-                    houseType: document.getElementById('houseType').value,
-                    amountCharged: parseFloat(document.getElementById('amountCharged').value),
-                    garbageFee: parseFloat(document.getElementById('garbageFee').value),
-                    phoneNumber: document.getElementById('phoneNumber').value,
-                    propertyId: document.getElementById('tenantPropertyId').value,
-                    propertyName: property.name,
-                    outstandingBalance: 0 // Initialize balance to zero
-                };
-
-                try {
-                    await addDoc(tenantCollectionRef, newTenant);
-                    showModal("Success", "Tenant added successfully!");
-                } catch (e) {
-                    console.error("Error adding tenant: ", e);
-                    showModal("Error", "Failed to add tenant. Please try again.");
-                }
-            });
-        }
-
-        async function showEditTenantModal(tenantId) {
-            const tenantToEdit = tenants.find(t => t.id === tenantId);
-            if (!tenantToEdit) {
-                showModal("Error", "Tenant not found.");
-                return;
-            }
-            const formHtml = `
-                <form id="editTenantForm" class="space-y-4">
-                    <input type="hidden" id="editTenantId" value="${tenantToEdit.id}">
-                    <div>
-                        <label for="editTenantName" class="block text-sm font-medium text-gray-700">Tenant Name</label>
-                        <input type="text" id="editTenantName" value="${tenantToEdit.name}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
-                    </div>
-                    <div>
-                        <label for="editHouseNumber" class="block text-sm font-medium text-gray-700">House Number/Unit</label>
-                        <input type="text" id="editHouseNumber" value="${tenantToEdit.houseNumber}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
-                    </div>
-                    <div>
-                        <label for="editHouseType" class="block text-sm font-medium text-gray-700">House Type</label>
-                        <select id="editHouseType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
-                            ${houseTypes.map(type => `<option value="${type}" ${tenantToEdit.houseType === type ? 'selected' : ''}>${type}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div>
-                        <label for="editAmountCharged" class="block text-sm font-medium text-gray-700">Monthly Rent (Ksh)</label>
-                        <input type="number" id="editAmountCharged" value="${tenantToEdit.amountCharged}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required min="0">
-                    </div>
-                    <div>
-                        <label for="editGarbageFee" class="block text-sm font-medium text-gray-700">Monthly Garbage Fee (Ksh)</label>
-                        <input type="number" id="editGarbageFee" value="${tenantToEdit.garbageFee}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" min="0">
-                    </div>
-                    <div>
-                        <label for="editPhoneNumber" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                        <input type="tel" id="editPhoneNumber" value="${tenantToEdit.phoneNumber}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200">Update Tenant</button>
-                </form>
-            `;
-            showModal(`Edit Tenant: ${tenantToEdit.name}`, formHtml);
-
-            document.getElementById('editTenantForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const updatedTenant = {
-                    name: document.getElementById('editTenantName').value,
-                    houseNumber: document.getElementById('editHouseNumber').value,
-                    houseType: document.getElementById('editHouseType').value,
-                    amountCharged: parseFloat(document.getElementById('editAmountCharged').value),
-                    garbageFee: parseFloat(document.getElementById('editGarbageFee').value),
-                    phoneNumber: document.getElementById('editPhoneNumber').value,
-                };
-                
-                try {
-                    const tenantRef = doc(db, `artifacts/default-app-id/users/${userId}/tenants`, tenantId);
-                    await updateDoc(tenantRef, updatedTenant);
-                    showModal("Success", "Tenant updated successfully!");
-                } catch (e) {
-                    console.error("Error updating tenant: ", e);
-                    showModal("Error", "Failed to update tenant. Please try again.");
-                }
-            });
-        }
-
-        async function deleteTenant(tenantId) {
-            try {
-                // Delete tenant document
-                await deleteDoc(doc(db, `artifacts/default-app-id/users/${userId}/tenants`, tenantId));
-                
-                // Delete all bills associated with the tenant
-                const qBills = query(billCollectionRef, where("tenantId", "==", tenantId));
-                const billSnapshot = await getDocs(qBills);
-                const billDeletePromises = billSnapshot.docs.map(bDoc => deleteDoc(doc(db, `artifacts/default-app-id/users/${userId}/bills`, bDoc.id)));
-                
-                // Delete all payments associated with the tenant
-                const qPayments = query(paymentCollectionRef, where("tenantId", "==", tenantId));
-                const paymentSnapshot = await getDocs(qPayments);
-                const paymentDeletePromises = paymentSnapshot.docs.map(pDoc => deleteDoc(doc(db, `artifacts/default-app-id/users/${userId}/payments`, pDoc.id)));
-                
-                await Promise.all([...billDeletePromises, ...paymentDeletePromises]);
-
-                showModal("Success", "Tenant and all associated data deleted successfully!");
-            } catch (e) {
-                console.error("Error deleting tenant: ", e);
-                showModal("Error", "Failed to delete tenant. Please try again.");
-            }
-        }
-
-        async function showRecordPaymentModal(tenantId) {
-            const tenantToPay = tenants.find(t => t.id === tenantId);
-            if (!tenantToPay) {
-                showModal("Error", "Tenant not found.");
-                return;
-            }
-            const formHtml = `
-                <form id="recordPaymentForm" class="space-y-4">
-                    <p class="text-gray-700">Recording payment for: <span class="font-bold">${tenantToPay.name} (${tenantToPay.houseNumber})</span></p>
-                    <div>
-                        <label for="paymentAmount" class="block text-sm font-medium text-gray-700">Amount Paid (Ksh)</label>
-                        <input type="number" id="paymentAmount" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="e.g., 10000" required min="0">
-                    </div>
-                    <div>
-                        <label for="paymentDate" class="block text-sm font-medium text-gray-700">Payment Date</label>
-                        <input type="date" id="paymentDate" value="${new Date().toISOString().substring(0, 10)}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
-                    </div>
-                    <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition duration-200">Record Payment</button>
-                </form>
-            `;
-            showModal("Record Payment", formHtml);
-
-            document.getElementById('recordPaymentForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const paymentAmount = parseFloat(document.getElementById('paymentAmount').value);
-                const paymentDate = document.getElementById('paymentDate').value;
                 const newPayment = {
-                    tenantId: tenantToPay.id,
-                    amount: paymentAmount,
+                    tenantId: tenantId,
+                    amountPaid: amountPaid,
                     paymentDate: paymentDate,
-                    createdAt: new Date().toISOString(),
-                    tenantName: tenantToPay.name,
-                    houseNumber: tenantToPay.houseNumber,
-                    propertyId: tenantToPay.propertyId,
-                    propertyName: tenantToPay.propertyName,
+                    type: paymentType,
+                    previousBalance: tenant.outstandingBalance,
+                    newBalance: newBalance,
+                    createdAt: new Date().toISOString()
                 };
-                try {
-                    await addDoc(paymentCollectionRef, newPayment);
-                    showModal("Success", `Payment of Ksh ${paymentAmount.toFixed(2)} recorded for ${tenantToPay.name}.`);
-                } catch (e) {
-                    console.error("Error recording payment: ", e);
-                    showModal("Error", "Failed to record payment. Please try again.");
-                }
-            });
-        }
-        
-        async function deleteBill(billId) {
-            try {
-                await deleteDoc(doc(db, `artifacts/default-app-id/users/${userId}/bills`, billId));
-                showModal("Success", "Bill deleted successfully!");
-            } catch (e) {
-                console.error("Error deleting bill: ", e);
-                showModal("Error", "Failed to delete bill. Please try again.");
+
+                await addDoc(paymentCollectionRef, newPayment);
+                await updateDoc(tenantDocRef, { outstandingBalance: newBalance });
+
+                showModal("Payment Recorded", `Payment of Ksh ${amountPaid.toFixed(2)} recorded for ${tenant.name}. New balance: Ksh ${newBalance.toFixed(2)}.`);
+            } catch (error) {
+                console.error("Error recording payment:", error);
+                showModal("Error", `Failed to record payment: ${error.message}`);
             }
         }
-        
-        async function showReceiptModal(billId) {
-            const bill = bills.find(b => b.id === billId);
-            if (!bill) {
-                showModal("Error", "Bill not found.");
+
+
+        async function handleGenerateBill() {
+            const selectedTenantId = document.getElementById('selectTenant').value;
+            const rent = parseFloat(document.getElementById('rent')?.value) || 0;
+            const lastWaterReading = parseFloat(document.getElementById('lastWaterReading')?.value) || 0;
+            const currentWaterReading = parseFloat(document.getElementById('currentWaterReading')?.value) || 0;
+            const waterPricePerUnit = parseFloat(document.getElementById('waterPricePerUnit')?.value) || 0;
+            const waterAmount = parseFloat(document.getElementById('waterAmount')?.value) || 0; // This is already calculated
+            const garbageAmount = parseFloat(document.getElementById('garbageAmount')?.value) || 0;
+            const otherPayments = parseFloat(document.getElementById('otherPayments')?.value) || 0;
+            const paymentDeadline = document.getElementById('paymentDeadline')?.value;
+            const totalPayment = parseFloat(document.getElementById('totalPaymentDisplay')?.textContent.replace('Ksh ', '')) || 0;
+
+
+            if (!selectedTenantId || !rent || !paymentDeadline) {
+                showModal("Input Error", "Please select a tenant and fill in Rent and Payment Deadline.");
                 return;
             }
-            
-            const paymentsForBill = payments.filter(p => p.tenantId === bill.tenantId);
-            const totalPaidForBill = paymentsForBill.reduce((sum, p) => sum + p.amount, 0);
-            const outstandingBalance = bill.totalAmount - totalPaidForBill;
-            
+            if (currentWaterReading < lastWaterReading) {
+                 showModal("Input Error", "Current water reading cannot be less than last month's reading.");
+                 return;
+            }
+
+            const selectedTenant = tenants.find(t => t.id === selectedTenantId);
+            if (!selectedTenant) {
+                showModal("Error", "Selected tenant not found.");
+                return;
+            }
+
+            try {
+                const billToSave = {
+                    tenantId: selectedTenant.id,
+                    tenantName: selectedTenant.name,
+                    houseNumber: selectedTenant.houseNumber,
+                    propertyName: properties.find(p => p.id === selectedTenant.propertyId)?.name || 'N/A', // Display name
+                    propertyNameId: selectedTenant.propertyId, // Store ID for filtering
+                    rent: rent,
+                    waterUnits: currentWaterReading - lastWaterReading,
+                    waterAmount: waterAmount,
+                    garbageAmount: garbageAmount,
+                    otherPayments: otherPayments,
+                    totalPayment: totalPayment,
+                    paymentDeadline: paymentDeadline,
+                    billDate: new Date().toISOString(),
+                    servedBy: "Prince Alex Property Management",
+                    paymentAccount: "M-Pesa Paybill: 123456, Account No: [House No.]",
+                    logoUrl: "https://placehold.co/100x100/4F46E5/FFFFFF?text=Logo",
+                    createdAt: new Date().toISOString(),
+                };
+
+                await addDoc(billCollectionRef, billToSave);
+
+                // Update tenant's lastWaterReading and outstandingBalance
+                const tenantDocRef = doc(tenantCollectionRef, selectedTenantId);
+                await updateDoc(tenantDocRef, {
+                    lastWaterReading: currentWaterReading,
+                    outstandingBalance: totalPayment // New bill becomes the outstanding balance
+                });
+
+                showModal("Success", "Bill generated and saved successfully!");
+                // Reset form fields
+                const selectTenantElement = document.getElementById('selectTenant');
+                if (selectTenantElement) selectTenantElement.value = '';
+                const rentElement = document.getElementById('rent');
+                if (rentElement) rentElement.value = '';
+                const lastWaterReadingElement = document.getElementById('lastWaterReading');
+                if (lastWaterReadingElement) lastWaterReadingElement.value = '';
+                const currentWaterReadingElement = document.getElementById('currentWaterReading');
+                if (currentWaterReadingElement) currentWaterReadingElement.value = '';
+                const waterAmountElement = document.getElementById('waterAmount');
+                if (waterAmountElement) waterAmountElement.value = '';
+                const garbageAmountElement = document.getElementById('garbageAmount');
+                if (garbageAmountElement) garbageAmountElement.value = '';
+                const otherPaymentsElement = document.getElementById('otherPayments');
+                if (otherPaymentsElement) otherPaymentsElement.value = '';
+                const paymentDeadlineElement = document.getElementById('paymentDeadline');
+                if (paymentDeadlineElement) paymentDeadlineElement.value = '';
+                const totalPaymentDisplayElement = document.getElementById('totalPaymentDisplay');
+                if (totalPaymentDisplayElement) totalPaymentDisplayElement.textContent = 'Ksh 0.00';
+                // Firestore listeners will trigger re-render, no need to call renderDashboardPage directly
+            } catch (error) {
+                console.error("Error generating bill:", error);
+                showModal("Error", `Failed to generate bill: ${error.message}`);
+            }
+        }
+
+        function generatePdfReceipt(bill) {
             const receiptHtml = `
-                <div class="p-4 md:p-8">
-                    <div class="text-center mb-6">
-                        <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Payment Receipt</h2>
-                        <p class="text-gray-500 mt-2">Prince Alex Property</p>
-                    </div>
-                    <div class="bg-gray-100 p-4 rounded-lg mb-4">
-                        <p class="text-sm text-gray-600"><strong>Receipt ID:</strong> ${bill.id.substring(0, 8).toUpperCase()}</p>
-                        <p class="text-sm text-gray-600"><strong>Date:</strong> ${new Date(bill.date).toLocaleDateString()}</p>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
-                        <h3 class="font-semibold text-lg mb-2 text-gray-800">Billed To:</h3>
-                        <p class="text-gray-700">${bill.tenantName}</p>
-                        <p class="text-gray-700">${bill.houseNumber} | ${bill.propertyName}</p>
-                    </div>
-                    <div class="overflow-x-auto mb-6">
-                        <table class="min-w-full">
-                            <thead class="border-b-2">
-                                <tr>
-                                    <th class="text-left text-sm font-semibold text-gray-600 pb-2">Description</th>
-                                    <th class="text-right text-sm font-semibold text-gray-600 pb-2">Amount (Ksh)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="border-b">
-                                    <td class="py-2 text-sm text-gray-700">${bill.billType}</td>
-                                    <td class="py-2 text-right text-sm text-gray-700">${bill.totalAmount.toFixed(2)}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="flex justify-end mb-6">
+                <div id="receipt-content-inner" class="p-8 bg-white max-w-2xl mx-auto border border-gray-300 rounded-lg shadow-lg" style="font-family: 'Inter', sans-serif;">
+                    <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+                        <img src="${bill.logoUrl}" alt="Company Logo" class="h-20 w-20 rounded-full shadow-md">
                         <div class="text-right">
-                            <p class="text-sm text-gray-700 font-semibold">Total Billed:</p>
-                            <p class="text-2xl font-bold text-gray-800">Ksh ${bill.totalAmount.toFixed(2)}</p>
-                            <p class="text-sm text-gray-700 font-semibold mt-2">Total Paid:</p>
-                            <p class="text-xl font-bold text-green-600">Ksh ${totalPaidForBill.toFixed(2)}</p>
-                            <p class="text-sm text-gray-700 font-semibold mt-2">Outstanding Balance:</p>
-                            <p class="text-xl font-bold ${outstandingBalance > 0 ? 'text-red-600' : 'text-green-600'}">Ksh ${outstandingBalance.toFixed(2)}</p>
+                            <h1 class="text-3xl font-bold text-gray-800">RENT RECEIPT</h1>
+                            <p class="text-gray-600 text-sm">Prince Alex Property</p>
+                            <p class="text-gray-600 text-sm">Nairobi, Kenya</p>
+                            <p class="text-gray-600 text-sm">info@princealex.com | +254 7XX XXX XXX</p>
                         </div>
                     </div>
-                    <div class="text-center text-gray-500 text-sm">
-                        <p>Thank you for your payment!</p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-8 text-sm">
+                        <div>
+                            <p class="font-semibold text-gray-700">Bill To:</p>
+                            <p class="text-gray-800">${bill.tenantName}</p>
+                            <p class="text-gray-800">${bill.propertyName}, House No: ${bill.houseNumber}</p>
+                            <p class="text-gray-800">Phone: ${tenants.find(t => t.id === bill.tenantId)?.phoneNumber || 'N/A'}</p>
+                        </div>
+                        <div class="text-right">
+                            <p><span class="font-semibold text-gray-700">Receipt Date:</span> ${new Date(bill.billDate).toLocaleDateString('en-KE')}</p>
+                            <p><span class="font-semibold text-gray-700">Payment Deadline:</span> ${new Date(bill.paymentDeadline).toLocaleDateString('en-KE')}</p>
+                            <p><span class="font-semibold text-gray-700">Served By:</span> ${bill.servedBy}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <table class="min-w-full bg-gray-50 rounded-lg overflow-hidden">
+                            <thead class="bg-gray-200">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Description</th>
+                                    <th class="py-3 px-4 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Amount (Ksh)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="py-3 px-4 text-sm text-gray-800">Monthly Rent</td>
+                                    <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.rent.toFixed(2)}</td>
+                                </tr>
+                                ${bill.waterAmount > 0 ? `
+                                <tr>
+                                    <td class="py-3 px-4 text-sm text-gray-800">Water Charges (${bill.waterUnits || 'N/A'} units)</td>
+                                    <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.waterAmount.toFixed(2)}</td>
+                                </tr>` : ''}
+                                ${bill.garbageAmount > 0 ? `
+                                <tr>
+                                    <td class="py-3 px-4 text-sm text-gray-800">Garbage Collection</td>
+                                    <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.garbageAmount.toFixed(2)}</td>
+                                </tr>` : ''}
+                                ${bill.otherPayments > 0 ? `
+                                <tr>
+                                    <td class="py-3 px-4 text-sm text-gray-800">Other Payments</td>
+                                    <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.otherPayments.toFixed(2)}</td>
+                                </tr>` : ''}
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-gray-100">
+                                    <td class="py-3 px-4 text-left text-base font-semibold text-gray-800">Total Amount Due</td>
+                                    <td class="py-3 px-4 text-right text-lg font-bold text-blue-700">Ksh ${bill.totalPayment.toFixed(2)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="text-center text-sm text-gray-700 mb-8">
+                        <p class="font-semibold">Payment Details:</p>
+                        <p>${bill.paymentAccount}</p>
+                        <p>Thank you for your prompt payment!</p>
+                    </div>
+
+                    <div class="text-center text-xs text-gray-500 pt-4 border-t border-gray-200">
+                        <p>&copy; ${new Date().getFullYear()} Prince Alex Property. All rights reserved.</p>
                     </div>
                 </div>
             `;
-            showModal(`Receipt for ${bill.tenantName}`, receiptHtml);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.id = 'receipt-content-wrapper';
+            contentDiv.className = 'overflow-y-auto max-h-[70vh]';
+            contentDiv.innerHTML = receiptHtml;
+
+            showModal(
+                "Rent Receipt Preview",
+                contentDiv,
+                'custom', // Use a custom type to control buttons
+                null // No direct confirm action for this modal
+            );
+
+            // Add download button to the modal footer
+            const modalFooter = document.querySelector('.modal-footer');
+            if (modalFooter) {
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200';
+                downloadBtn.textContent = 'Download PDF';
+                downloadBtn.addEventListener('click', () => downloadPdf(bill));
+                modalFooter.appendChild(downloadBtn);
+            }
         }
-        
-        async function generatePDF(billId) {
-            const bill = bills.find(b => b.id === billId);
-            if (!bill) {
-                showModal("Error", "Bill not found.");
+
+        async function downloadPdf(bill) {
+            const input = document.getElementById('receipt-content-inner'); // Target the inner content
+            if (input) {
+                try {
+                    const canvas = await html2canvas(input, { scale: 2 });
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jspdf.jsPDF('p', 'mm', 'a4'); // Correct way to access jsPDF
+                    const imgWidth = 210; // A4 width in mm
+                    const pageHeight = 297; // A4 height in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    pdf.save(`rent-receipt-${bill.tenantName.replace(/\s/g, '-')}-${bill.houseNumber}.pdf`);
+                } catch (err) {
+                    console.error("Error generating PDF:", err);
+                    showModal("Error", "Failed to generate PDF. Please try again.");
+                }
+            }
+        }
+
+        async function downloadAllPdfReceiptsForCurrentMonth() {
+            const currentMonth = billingHistoryFilterMonth; // Use the selected month from the filter
+            const billsToPrint = bills.filter(bill => {
+                const billMonth = bill.billDate.substring(0, 7);
+                const matchesMonth = (billMonth === currentMonth);
+                
+                // Corrected property filtering for "Print All" button
+                const matchesProperty = (selectedPropertyForBillingFilter === '' || bill.propertyNameId === selectedPropertyForBillingFilter);
+                return matchesMonth && matchesProperty;
+            });
+
+            if (billsToPrint.length === 0) {
+                showModal("No Bills", "No bills found for the selected property and month to print.");
                 return;
             }
 
-            const loadingModalContent = `<div class="text-center py-8"><div class="loading-spinner rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div><p class="mt-4 text-lg text-gray-700">Generating PDF...</p></div>`;
-            showModal("Generating PDF", loadingModalContent);
-        
-            try {
-                // Fetch the content of the receipt modal
-                const tempDiv = document.createElement('div');
-                tempDiv.style.position = 'absolute';
-                tempDiv.style.left = '-9999px';
-                tempDiv.style.width = '210mm'; // A4 width
-                tempDiv.style.padding = '20mm';
-                tempDiv.innerHTML = `
-                    <div class="p-4 md:p-8 bg-white" style="width: 100%;">
-                        <div class="text-center mb-6">
-                            <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Payment Receipt</h2>
-                            <p class="text-gray-500 mt-2">Prince Alex Property</p>
-                        </div>
-                        <div class="bg-gray-100 p-4 rounded-lg mb-4">
-                            <p class="text-sm text-gray-600"><strong>Receipt ID:</strong> ${bill.id.substring(0, 8).toUpperCase()}</p>
-                            <p class="text-sm text-gray-600"><strong>Date:</strong> ${new Date(bill.date).toLocaleDateString()}</p>
-                        </div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
-                            <h3 class="font-semibold text-lg mb-2 text-gray-800">Billed To:</h3>
-                            <p class="text-gray-700">${bill.tenantName}</p>
-                            <p class="text-gray-700">${bill.houseNumber} | ${bill.propertyName}</p>
-                        </div>
-                        <div class="overflow-x-auto mb-6">
-                            <table class="min-w-full">
-                                <thead class="border-b-2">
-                                    <tr>
-                                        <th class="text-left text-sm font-semibold text-gray-600 pb-2">Description</th>
-                                        <th class="text-right text-sm font-semibold text-gray-600 pb-2">Amount (Ksh)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="border-b">
-                                        <td class="py-2 text-sm text-gray-700">${bill.billType}</td>
-                                        <td class="py-2 text-right text-sm text-gray-700">${bill.totalAmount.toFixed(2)}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="flex justify-end mb-6">
+            showModal("Generating Receipts", `Generating ${billsToPrint.length} receipts... This may take a moment.`, 'alert');
+
+            for (const bill of billsToPrint) {
+                const receiptHtml = `
+                    <div class="p-8 bg-white max-w-2xl mx-auto border border-gray-300 rounded-lg shadow-lg" style="font-family: 'Inter', sans-serif;">
+                        <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+                            <img src="${bill.logoUrl}" alt="Company Logo" class="h-20 w-20 rounded-full shadow-md">
                             <div class="text-right">
-                                <p class="text-sm text-gray-700 font-semibold">Total Billed:</p>
-                                <p class="text-2xl font-bold text-gray-800">Ksh ${bill.totalAmount.toFixed(2)}</p>
-                                <p class="text-sm text-gray-700 font-semibold mt-2">Total Paid:</p>
-                                <p class="text-xl font-bold text-green-600">Ksh ${payments.filter(p => p.tenantId === bill.tenantId).reduce((sum, p) => sum + p.amount, 0).toFixed(2)}</p>
-                                <p class="text-sm text-gray-700 font-semibold mt-2">Outstanding Balance:</p>
-                                <p class="text-xl font-bold ${bill.totalAmount - payments.filter(p => p.tenantId === bill.tenantId).reduce((sum, p) => sum + p.amount, 0) > 0 ? 'text-red-600' : 'text-green-600'}">Ksh ${(bill.totalAmount - payments.filter(p => p.tenantId === bill.tenantId).reduce((sum, p) => sum + p.amount, 0)).toFixed(2)}</p>
+                                <h1 class="text-3xl font-bold text-gray-800">RENT RECEIPT</h1>
+                                <p class="text-gray-600 text-sm">Prince Alex Property</p>
+                                <p class="text-gray-600 text-sm">Nairobi, Kenya</p>
+                                <p class="text-gray-600 text-sm">info@princealex.com | +254 7XX XXX XXX</p>
                             </div>
                         </div>
-                        <div class="text-center text-gray-500 text-sm">
-                            <p>Thank you for your payment!</p>
+
+                        <div class="grid grid-cols-2 gap-4 mb-8 text-sm">
+                            <div>
+                                <p class="font-semibold text-gray-700">Bill To:</p>
+                                <p class="text-gray-800">${bill.tenantName}</p>
+                                <p class="text-gray-800">${bill.propertyName}, House No: ${bill.houseNumber}</p>
+                                <p class="text-gray-800">Phone: ${tenants.find(t => t.id === bill.tenantId)?.phoneNumber || 'N/A'}</p>
+                            </div>
+                            <div class="text-right">
+                                <p><span class="font-semibold text-gray-700">Receipt Date:</span> ${new Date(bill.billDate).toLocaleDateString('en-KE')}</p>
+                                <p><span class="font-semibold text-gray-700">Payment Deadline:</span> ${new Date(bill.paymentDeadline).toLocaleDateString('en-KE')}</p>
+                                <p><span class="font-semibold text-gray-700">Served By:</span> ${bill.servedBy}</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <table class="min-w-full bg-gray-50 rounded-lg overflow-hidden">
+                                <thead class="bg-gray-200">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Description</th>
+                                        <th class="py-3 px-4 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Amount (Ksh)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="py-3 px-4 text-sm text-gray-800">Monthly Rent</td>
+                                        <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.rent.toFixed(2)}</td>
+                                    </tr>
+                                    ${bill.waterAmount > 0 ? `
+                                    <tr>
+                                        <td class="py-3 px-4 text-sm text-gray-800">Water Charges (${bill.waterUnits || 'N/A'} units)</td>
+                                        <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.waterAmount.toFixed(2)}</td>
+                                    </tr>` : ''}
+                                    ${bill.garbageAmount > 0 ? `
+                                    <tr>
+                                        <td class="py-3 px-4 text-sm text-gray-800">Garbage Collection</td>
+                                        <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.garbageAmount.toFixed(2)}</td>
+                                    </tr>` : ''}
+                                    ${bill.otherPayments > 0 ? `
+                                    <tr>
+                                        <td class="py-3 px-4 text-sm text-gray-800">Other Payments</td>
+                                        <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.otherPayments.toFixed(2)}</td>
+                                    </tr>` : ''}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="bg-gray-100">
+                                        <td class="py-3 px-4 text-left text-base font-semibold text-gray-800">Total Amount Due</td>
+                                        <td class="py-3 px-4 text-right text-lg font-bold text-blue-700">Ksh ${bill.totalPayment.toFixed(2)}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="text-center text-sm text-gray-700 mb-8">
+                            <p class="font-semibold">Payment Details:</p>
+                            <p>${bill.paymentAccount}</p>
+                            <p>Thank you for your prompt payment!</p>
+                        </div>
+
+                        <div class="text-center text-xs text-gray-500 pt-4 border-t border-gray-200">
+                            <p>&copy; ${new Date().getFullYear()} Prince Alex Property. All rights reserved.</p>
                         </div>
                     </div>
                 `;
+
+                // Create a temporary div to render HTML for canvas
+                const tempDiv = document.createElement('div');
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                tempDiv.innerHTML = receiptHtml;
                 document.body.appendChild(tempDiv);
-        
-                // Convert the temporary div to a canvas using html2canvas
-                const canvas = await html2canvas(tempDiv, { scale: 2 });
-                const imgData = canvas.toDataURL('image/png');
-        
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const imgWidth = 210;
-                const pageHeight = 297;
-                const imgHeight = canvas.height * imgWidth / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 0;
-        
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-        
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
+
+                try {
+                    const canvas = await html2canvas(tempDiv, { scale: 2 });
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 210;
+                    const pageHeight = 297;
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+
                     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                     heightLeft -= pageHeight;
+
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    pdf.save(`rent-receipt-${bill.tenantName.replace(/\s/g, '-')}-${bill.houseNumber}.pdf`);
+                } catch (err) {
+                    console.error("Error generating PDF for all receipts:", err);
+                    showModal("Error", `Failed to generate PDF for ${bill.tenantName}. Please try again.`);
+                } finally {
+                    document.body.removeChild(tempDiv); // Clean up temporary div
                 }
-                pdf.save(`rent-receipt-${bill.tenantName.replace(/\s/g, '-')}-${bill.houseNumber}.pdf`);
-                
-                showModal("Receipt Generated", "The PDF receipt has been generated and downloaded.");
-            } catch (err) {
-                console.error("Error generating PDF for all receipts:", err);
-                showModal("Error", `Failed to generate PDF for ${bill.tenantName}. Please try again.`);
-            } finally {
-                document.body.removeChild(tempDiv); // Clean up temporary div
             }
+            showModal("Receipts Generated", "All selected receipts have been generated and downloaded.");
         }
 
 
