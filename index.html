@@ -32,14 +32,10 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             width: 100%;
             max-width: 48rem; /* Increased max-width for better layout */
-            /* New: Limit height and enable scrolling for content */
-            max-height: 90vh; /* Max height relative to viewport height */
-            display: flex; /* Use flexbox for internal layout */
-            flex-direction: column; /* Stack header, body, footer vertically */
-            overflow: hidden; /* Hide overflow on the main modal container */
             transform: scale(1);
             opacity: 1;
             transition: all 0.3s ease-out;
+            overflow: hidden; /* Ensure content inside doesn't overflow rounded corners */
         }
         .modal-header {
             display: flex;
@@ -47,12 +43,9 @@
             align-items: center;
             padding: 1.25rem;
             border-bottom: 1px solid #e5e7eb;
-            flex-shrink: 0; /* Prevent header from shrinking */
         }
         .modal-body {
             padding: 1rem;
-            flex-grow: 1; /* Allow body to grow and take available space */
-            overflow-y: auto; /* Enable vertical scrolling for the body content */
         }
         .modal-footer {
             padding: 1rem;
@@ -60,7 +53,6 @@
             display: flex;
             justify-content: flex-end;
             gap: 0.75rem;
-            flex-shrink: 0; /* Prevent footer from shrinking */
         }
         .loading-spinner {
             border-top-color: #3b82f6; /* Blue-500 */
