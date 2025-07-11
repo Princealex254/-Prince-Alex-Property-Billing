@@ -84,10 +84,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+    <!-- Firebase Config Injection -->
+    <script>
+        window.__firebase_config = JSON.stringify({
+            apiKey: "AIzaSyB1rF-ATVbH04EYa0ADc9KtDVO9UigYwn8",
+            authDomain: "prince-alex-property-billing.firebaseapp.com",
+            projectId: "prince-alex-property-billing",
+            storageBucket: "prince-alex-property-billing.firebasestorage.app",
+            messagingSenderId: "622455148749",
+            appId: "1:622455148749:web:b81c00836d6df828681984"
+        });
+    </script>
+
     <script type="module">
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         import { getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
         // Lucide Icons (as SVG strings for direct embedding)
@@ -212,16 +224,11 @@
         async function initializeFirebase() {
             try {
                 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                let firebaseConfig = {}; // Initialize as an empty object
-
-                // Safely parse __firebase_config
+                // Safely parse __firebase_config from window
+                const rawConfigString = window.__firebase_config || '{}';
+                let firebaseConfig = {};
                 try {
-                    const rawConfigString = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-                    if (rawConfigString && rawConfigString !== '{}') {
-                        firebaseConfig = JSON.parse(rawConfigString);
-                    } else if (rawConfigString === '{}') {
-                        firebaseConfig = {};
-                    }
+                    firebaseConfig = JSON.parse(rawConfigString);
                 } catch (e) {
                     console.error("Error parsing Firebase configuration string:", e);
                     showModal("Configuration Error", "Invalid Firebase configuration format. Please ensure it's a valid JSON string.");
@@ -289,7 +296,7 @@
                     }
                 });
 
-                // No initial token provided, proceed to login page.
+                // Always render login page initially, authentication will redirect to dashboard if successful
                 renderLoginPage();
 
             } catch (error) {
