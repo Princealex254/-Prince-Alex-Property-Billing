@@ -454,7 +454,7 @@
             appDiv.innerHTML = `
                 <div class="flex h-screen bg-gray-100">
                     <!-- Sidebar Navigation -->
-                    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-gray-800 text-white flex-col p-4 shadow-lg transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:static lg:translate-x-0 lg:flex">
+                    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-gray-800 text-white flex flex-col p-4 shadow-lg transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out">
                         <div class="flex items-center mb-8">
                             <img src="https://placehold.co/40x40/4F46E5/FFFFFF?text=P" alt="Logo" class="rounded-full mr-3" />
                             <h1 class="text-2xl font-bold">Prince Alex</h1>
@@ -497,11 +497,11 @@
                     </aside>
 
                     <!-- Main Content Area -->
-                    <main class="flex-1 overflow-auto p-8 transition-all duration-300 ease-in-out lg:ml-64">
+                    <main class="flex-1 overflow-auto p-8 ${isSidebarOpen ? 'lg:ml-64' : 'lg:ml-0'} transition-all duration-300 ease-in-out">
                         <!-- Header -->
                         <header class="bg-white rounded-xl shadow-md p-6 mb-8 flex justify-between items-center">
                             <h2 class="text-3xl font-bold text-gray-800">Welcome, ${userName}!</h2>
-                            <button id="menuToggleBtn" class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg lg:hidden">
+                            <button id="menuToggleBtn" class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg">
                                 ${isSidebarOpen ? icons.X : icons.Menu}
                             </button>
                             <div class="hidden lg:flex space-x-4">
@@ -787,7 +787,7 @@
             const modalTitle = editingTenant ? "Edit Tenant" : `Add Tenant to ${selectedProperty.name}`;
 
             const contentDiv = document.createElement('div');
-            contentDiv.className = 'p-4 space-y-4 overflow-y-auto max-h-[70vh]'; // Added overflow-y-auto and max-h
+            contentDiv.className = 'p-4 space-y-4';
             contentDiv.innerHTML = `
                 <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalTenantName">
@@ -1816,8 +1816,8 @@
                     const canvas = await html2canvas(input, { scale: 2 });
                     const imgData = canvas.toDataURL('image/png');
                     const pdf = new jspdf.jsPDF('p', 'mm', 'a4'); // Correct way to access jsPDF
-                    const imgWidth = 210;
-                    const pageHeight = 297;
+                    const imgWidth = 210; // A4 width in mm
+                    const pageHeight = 297; // A4 height in mm
                     const imgHeight = canvas.height * imgWidth / canvas.width;
                     let heightLeft = imgHeight;
                     let position = 0;
