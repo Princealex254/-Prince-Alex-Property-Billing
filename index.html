@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prince Alex Property Billing System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom styles for modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            padding: 1rem;
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 100%;
+            max-width: 48rem; /* Increased max-width for better layout */
+            transform: scale(1);
+            opacity: 1;
+            transition: all 0.3s ease-out;
+            overflow: hidden; /* Ensure content inside doesn't overflow rounded corners */
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .modal-body {
+            padding: 1rem;
+        }
+        .modal-footer {
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        .loading-spinner {
+            border-top-color: #3b82f6; /* Blue-500 */
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+        @-webkit-keyframes spinner {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="font-inter antialiased bg-gray-50 min-h-screen">
+    <div id="app">
+        <!-- Content will be dynamically loaded here by JavaScript -->
+        <div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+            <div class="text-center">
+                <div class="loading-spinner rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+                <p class="mt-4 text-lg text-gray-700">Loading application...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Libraries for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+        // Lucide Icons (as SVG strings for direct embedding)
+        const icons = {
+            Home: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+            Users: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+            Building: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9.5 16h5"/><path d="M9.5 12h5"/><path d="M9.5 8h5"/><path d="M12 22V2"/></svg>`,
+            Receipt: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-receipt"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2h-2.5a2 2 0 0 1-2-2H6.5a2 2 0 0 1-2 2H4Z"/><path d="M18 6H8"/><path d="M18 10H8"/><path d="M18 14H8"/><path d="M18 18H8"/></svg>`,
+            PlusCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>`,
+            Edit: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>`,
+            Trash2: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`,
+            LogOut: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="17 16 22 12 17 8"/><line x1="22" x2="11" y1="12" y2="12"/></svg>`,
+            FileText: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>`,
+            Calendar: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>`,
+            HomeIcon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`, // Reusing Home for HomeIcon
+            Wallet: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h12a2 2 0 0 1 0 4H5a2 2 0 0 0 0 4h12a2 2 0 0 0 2-2v-3"/><path d="M22 7V4a1 1 0 0 0-1-1H3a2 2 0 0 0 0 4h18a1 1 0 0 0 1-1Z"/></svg>`,
+            Search: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`,
+            DollarSign: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dollar-sign"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`
+        };
+
+
+        // Global State
+        let user = null; // Represents the logged-in user (for display name)
+        let userId = null; // Firebase User ID
+        let currentPage = 'login'; // 'login', 'dashboard'
+        let properties = [];
+        let tenants = [];
+        let bills = [];
+        let payments = []; // New array for payment records
+        let activeTab = 'summary'; // 'summary', 'properties', 'billing', 'finance'
+        let tenantSearchQuery = ''; // New state for tenant search in properties tab
+        let billingTenantSearchQuery = ''; // New state for tenant search in billing tab
+        let selectedPropertyForBillingFilter = ''; // New state for billing property filter
+        let billingHistoryFilterMonth = new Date().toISOString().substring(0, 7); // YYYY-MM format, default to current month
+        let selectedPropertyForFinanceFilter = ''; // New state for finance property filter
+
+        const houseTypes = ['Apartment', 'Bungalow', 'Mansionette', 'Commercial Space', 'Shop'];
+        const WATER_PRICE_PER_UNIT = 50; // Example: Ksh 50 per water unit
+
+        // Firebase variables
+        let firebaseApp;
+        let db;
+        let auth;
+
+        // Collection paths (dynamic based on appId and userId)
+        let propertyCollectionRef;
+        let tenantCollectionRef;
+        let billCollectionRef;
+        let paymentCollectionRef;
+
+        // Custom Modal Functions (replaces alert and confirm)
+        function showModal(title, content, type = 'alert', onConfirm = null) {
+            const appDiv = document.getElementById('app');
+            let modalOverlay = document.querySelector('.modal-overlay');
+
+            if (!modalOverlay) {
+                modalOverlay = document.createElement('div');
+                modalOverlay.className = 'modal-overlay';
+                appDiv.appendChild(modalOverlay);
+            }
+
+            // Ensure content is a DOM element if it's not a string
+            const contentElement = typeof content === 'string' ? `<p class="text-gray-700">${content}</p>` : content.outerHTML || '';
+
+            modalOverlay.innerHTML = `
+                <div class="modal-content max-w-xl">
+                    <div class="modal-header">
+                        <h3 class="text-xl font-bold text-gray-800">${title}</h3>
+                        <button class="text-gray-500 hover:text-gray-700 transition duration-200 modal-close-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="modal-body p-4">
+                        ${contentElement}
+                    </div>
+                    <div class="modal-footer">
+                        ${type === 'confirm' ? `
+                            <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition duration-200 modal-cancel-btn">
+                                Cancel
+                            </button>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 modal-confirm-btn">
+                                Confirm
+                            </button>
+                        ` : `
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 modal-close-btn">
+                                OK
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `;
+            modalOverlay.style.display = 'flex'; // Ensure it's visible
+
+            // If content was a DOM element, re-append it so event listeners work
+            if (typeof content !== 'string') {
+                const modalBody = modalOverlay.querySelector('.modal-body');
+                modalBody.innerHTML = ''; // Clear the innerHTML from the template
+                modalBody.appendChild(content); // Append the actual DOM element
+            }
+
+
+            const closeModal = () => {
+                modalOverlay.style.display = 'none';
+                modalOverlay.innerHTML = ''; // Clear content
+            };
+
+            modalOverlay.querySelector('.modal-close-btn').addEventListener('click', closeModal);
+
+            if (type === 'confirm') {
+                modalOverlay.querySelector('.modal-cancel-btn').addEventListener('click', closeModal);
+                modalOverlay.querySelector('.modal-confirm-btn').addEventListener('click', () => {
+                    if (onConfirm) onConfirm();
+                    closeModal();
+                });
+            }
+        }
+
+
+        // Firebase Initialization and Authentication
+        async function initializeFirebase() {
+            try {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+                firebaseApp = initializeApp(firebaseConfig);
+                db = getFirestore(firebaseApp);
+                auth = getAuth(firebaseApp);
+
+                // Set up authentication listener
+                onAuthStateChanged(auth, async (currentUser) => {
+                    if (currentUser) {
+                        user = { displayName: currentUser.displayName || "Admin" };
+                        userId = currentUser.uid;
+                        // Define collection references after userId is available
+                        propertyCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/properties`);
+                        tenantCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/tenants`);
+                        billCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/bills`);
+                        paymentCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/payments`);
+                        
+                        await initializeFirestoreListeners(); // Start listening to data changes
+                        currentPage = 'dashboard'; // Set page to dashboard after successful auth and listeners
+                        renderDashboardPage(); // Render dashboard once authenticated and data listeners are set
+                    } else {
+                        user = null;
+                        userId = null;
+                        currentPage = 'login';
+                        renderLoginPage();
+                    }
+                });
+
+                // Initial sign-in attempt (e.g., anonymous for demo, or using token if available)
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    // This will be handled by the login form now, or if no user is present,
+                    // the onAuthStateChanged will redirect to login.
+                }
+
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                showModal("Firebase Error", `Failed to initialize Firebase: ${error.message}`);
+                // Fallback to login page or display a persistent error
+                renderLoginPage();
+            }
+        }
+
+        // Firestore Real-time Listeners
+        async function initializeFirestoreListeners() {
+            // Properties Listener
+            onSnapshot(propertyCollectionRef, (snapshot) => {
+                properties = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // Trigger re-render of relevant sections
+                if (currentPage === 'dashboard') {
+                    updatePropertiesList();
+                    updateBillingTenantDropdown();
+                    renderFinancialSection(document.getElementById('contentSection')); // Re-render finance section to update filters
+                }
+            }, (error) => {
+                console.error("Error listening to properties:", error);
+                showModal("Firestore Error", `Failed to load properties: ${error.message}`);
+            });
+
+            // Tenants Listener
+            onSnapshot(tenantCollectionRef, (snapshot) => {
+                tenants = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // Trigger re-render of relevant sections
+                if (currentPage === 'dashboard') {
+                    updatePropertiesList();
+                    updateBillingTenantDropdown();
+                    renderFinancialSection(document.getElementById('contentSection')); // Re-render finance section to update balances
+                }
+            }, (error) => {
+                console.error("Error listening to tenants:", error);
+                showModal("Firestore Error", `Failed to load tenants: ${error.message}`);
+            });
+
+            // Bills Listener
+            onSnapshot(billCollectionRef, (snapshot) => {
+                bills = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                bills.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort newest first
+                // Trigger re-render of relevant sections
+                if (currentPage === 'dashboard') {
+                    updateGeneratedBillsList();
+                    renderFinancialSection(document.getElementById('contentSection')); // Re-render finance section to update billed amounts
+                }
+            }, (error) => {
+                console.error("Error listening to bills:", error);
+                showModal("Firestore Error", `Failed to load bills: ${error.message}`);
+            });
+
+            // Payments Listener
+            onSnapshot(paymentCollectionRef, (snapshot) => {
+                payments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                payments.sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate)); // Sort newest first
+                // Trigger re-render of relevant sections
+                if (currentPage === 'dashboard') {
+                    renderFinancialSection(document.getElementById('contentSection')); // Re-render finance section to update paid amounts
+                }
+            }, (error) => {
+                console.error("Error listening to payments:", error);
+                showModal("Firestore Error", `Failed to load payments: ${error.message}`);
+            });
+        }
+
+
+        // Render Functions
+        function renderApp() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = ''; // Clear existing content
+
+            // Show initial loading spinner
+            appDiv.innerHTML = `
+                <div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+                    <div class="text-center">
+                        <div class="loading-spinner rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+                        <p class="mt-4 text-lg text-gray-700">Loading application...</p>
+                    </div>
+                </div>
+            `;
+
+            // Firebase will handle rendering after authentication and data load
+        }
+
+        function renderLoginPage() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = `
+                <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
+                    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-300 hover:scale-105">
+                        <div class="flex justify-center mb-6">
+                            <img src="https://placehold.co/100x100/4F46E5/FFFFFF?text=Logo" alt="Prince Alex Property Logo" class="rounded-full shadow-lg" />
+                        </div>
+                        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Welcome to Prince Alex Property</h2>
+                        <p class="text-center text-gray-600 mb-8">Property Billing System</p>
+                        <form id="loginForm" class="space-y-6">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2" for="email">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                                    placeholder="Enter your email"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2" for="password">
+                                    Password
+                                </label>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                                    placeholder="Enter your password"
+                                    required
+                                />
+                            </div>
+                            <p id="loginError" class="text-red-600 text-sm text-center hidden"></p>
+                            <button
+                                type="submit"
+                                class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold text-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 shadow-lg"
+                            >
+                                Login
+                            </button>
+                        </form>
+                        <p class="mt-8 text-center text-gray-500 text-sm">
+                            To create an account, simply enter a new email and password and click login.
+                            <br>
+                            For a quick demo, you can leave fields empty and click login (anonymous sign-in).
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('loginForm').addEventListener('submit', handleLoginSubmit);
+        }
+
+        function renderDashboardPage() {
+            const appDiv = document.getElementById('app');
+            const userName = user?.displayName || "User";
+            const totalProperties = properties.length;
+            const totalTenants = tenants.length;
+            const billsGenerated = bills.length;
+
+            appDiv.innerHTML = `
+                <div class="flex h-screen bg-gray-100">
+                    <!-- Sidebar Navigation -->
+                    <aside class="w-64 bg-gray-800 text-white flex flex-col p-4 shadow-lg">
+                        <div class="flex items-center mb-8">
+                            <img src="https://placehold.co/40x40/4F46E5/FFFFFF?text=P" alt="Logo" class="rounded-full mr-3" />
+                            <h1 class="text-2xl font-bold">Prince Alex</h1>
+                        </div>
+                        <nav class="flex-grow">
+                            <ul>
+                                <li class="mb-2">
+                                    <button id="navSummary"
+                                        class="flex items-center w-full p-3 rounded-lg transition duration-200 ${activeTab === 'summary' ? 'bg-blue-600' : 'hover:bg-gray-700'}">
+                                        ${icons.Home} <span class="ml-3">Dashboard Overview</span>
+                                    </button>
+                                </li>
+                                <li class="mb-2">
+                                    <button id="navProperties"
+                                        class="flex items-center w-full p-3 rounded-lg transition duration-200 ${activeTab === 'properties' ? 'bg-blue-600' : 'hover:bg-gray-700'}">
+                                        ${icons.Building} <span class="ml-3">Your Properties</span>
+                                    </button>
+                                </li>
+                                <li class="mb-2">
+                                    <button id="navBilling"
+                                        class="flex items-center w-full p-3 rounded-lg transition duration-200 ${activeTab === 'billing' ? 'bg-blue-600' : 'hover:bg-gray-700'}">
+                                        ${icons.Receipt} <span class="ml-3">Billing & Receipts</span>
+                                    </button>
+                                </li>
+                                <li class="mb-2">
+                                    <button id="navFinance"
+                                        class="flex items-center w-full p-3 rounded-lg transition duration-200 ${activeTab === 'finance' ? 'bg-blue-600' : 'hover:bg-gray-700'}">
+                                        ${icons.DollarSign} <span class="ml-3">Financial Overview</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                        <div class="mt-auto">
+                            <button id="logoutBtn"
+                                class="flex items-center w-full p-3 rounded-lg bg-red-600 hover:bg-red-700 transition duration-200 text-white">
+                                ${icons.LogOut} <span class="ml-3">Logout</span>
+                            </button>
+                            <p class="text-xs text-gray-400 mt-4 break-all">User ID: ${userId || 'N/A'}</p>
+                        </div>
+                    </aside>
+
+                    <!-- Main Content Area -->
+                    <main class="flex-1 overflow-auto p-8">
+                        <!-- Header -->
+                        <header class="bg-white rounded-xl shadow-md p-6 mb-8 flex justify-between items-center">
+                            <h2 class="text-3xl font-bold text-gray-800">Welcome, ${userName}!</h2>
+                            <div class="flex space-x-4">
+                                <div class="flex items-center text-gray-600">
+                                    ${icons.Calendar}
+                                    <span class="ml-2">${new Date().toLocaleDateString('en-KE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                </div>
+                            </div>
+                        </header>
+
+                        <!-- Content Section based on activeTab -->
+                        <div id="contentSection"></div>
+                    </main>
+                </div>
+            `;
+
+            // Add event listeners for navigation
+            document.getElementById('navSummary').addEventListener('click', () => { activeTab = 'summary'; renderDashboardPage(); });
+            document.getElementById('navProperties').addEventListener('click', () => { activeTab = 'properties'; renderDashboardPage(); });
+            document.getElementById('navBilling').addEventListener('click', () => { activeTab = 'billing'; renderDashboardPage(); });
+            document.getElementById('navFinance').addEventListener('click', () => { activeTab = 'finance'; renderDashboardPage(); });
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+            // Render content based on active tab
+            const contentSection = document.getElementById('contentSection');
+            if (activeTab === 'summary') {
+                contentSection.innerHTML = renderSummarySection(totalProperties, totalTenants, billsGenerated);
+            } else if (activeTab === 'properties') {
+                renderPropertiesSection(contentSection);
+            } else if (activeTab === 'billing') {
+                renderBillingSection(contentSection);
+            } else if (activeTab === 'finance') {
+                renderFinancialSection(contentSection);
+            }
+        }
+
+        function renderSummarySection(totalProperties, totalUnits, billsGenerated) {
+            return `
+                <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    ${renderStatCard(icons.Building, "Total Properties", totalProperties)}
+                    ${renderStatCard(icons.HomeIcon, "Total Units", totalUnits)}
+                    ${renderStatCard(icons.Users, "Total Tenants", tenants.length)}
+                    ${renderStatCard(icons.Receipt, "Bills Generated", billsGenerated)}
+                </section>
+            `;
+        }
+
+        function renderStatCard(icon, title, value) {
+            return `
+                <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
+                    <div class="p-3 bg-blue-100 text-blue-600 rounded-full">
+                        ${icon}
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">${title}</p>
+                        <h3 class="text-2xl font-bold text-gray-900">${value}</h3>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPropertiesSection(parentEl) {
+            parentEl.innerHTML = `
+                <section class="bg-white rounded-xl shadow-md p-6 mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-gray-800">Your Properties</h3>
+                        <button id="addPropertyBtn"
+                            class="bg-blue-600 text-white px-5 py-2 rounded-lg flex items-center hover:bg-blue-700 transition duration-200 shadow-md">
+                            ${icons.PlusCircle} <span class="ml-2">Add Property</span>
+                        </button>
+                    </div>
+
+                    <div class="relative mb-6">
+                        <input type="text" id="tenantSearchInput" placeholder="Search tenants by name or house number..."
+                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            ${icons.Search}
+                        </div>
+                    </div>
+
+                    <div id="propertiesList" class="space-y-6">
+                        ${properties.length === 0 ? `
+                            <p class="text-gray-600 text-center py-8">No properties added yet. Click "Add Property" to get started!</p>
+                        ` : ''}
+                    </div>
+                </section>
+            `;
+
+            document.getElementById('addPropertyBtn').addEventListener('click', () => showAddPropertyModal());
+            document.getElementById('tenantSearchInput').value = tenantSearchQuery; // Set initial value
+            document.getElementById('tenantSearchInput').addEventListener('input', (e) => {
+                tenantSearchQuery = e.target.value;
+                updatePropertiesList(); // Re-render properties list with filtered tenants
+            });
+            updatePropertiesList();
+        }
+
+        function updatePropertiesList() {
+            const propertiesListDiv = document.getElementById('propertiesList');
+            if (!propertiesListDiv) return; // Ensure the element exists
+
+            if (properties.length === 0) {
+                propertiesListDiv.innerHTML = `<p class="text-gray-600 text-center py-8">No properties added yet. Click "Add Property" to get started!</p>`;
+                return;
+            }
+
+            // Filter tenants based on search query
+            const filteredTenants = tenants.filter(tenant => {
+                const query = tenantSearchQuery.toLowerCase();
+                return tenant.name.toLowerCase().includes(query) ||
+                       tenant.houseNumber.toLowerCase().includes(query);
+            });
+
+            if (filteredTenants.length === 0 && tenantSearchQuery !== '') {
+                propertiesListDiv.innerHTML = `<p class="text-gray-600 text-center py-8">No tenants found matching "${tenantSearchQuery}".</p>`;
+                return;
+            }
+
+
+            propertiesListDiv.innerHTML = properties.map(property => {
+                const tenantsForProperty = filteredTenants.filter(t => t.propertyId === property.id);
+
+                // Only render property if it has tenants or if no search query is active
+                if (tenantsForProperty.length === 0 && tenantSearchQuery !== '') {
+                    return ''; // Don't render property if no matching tenants and search is active
+                }
+
+                return `
+                    <div class="border border-gray-200 rounded-lg p-5 bg-gray-50 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-semibold text-gray-700">${property.name}</h4>
+                            <div class="flex space-x-2">
+                                <button data-property-id="${property.id}"
+                                    class="add-tenant-btn bg-green-500 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-green-600 transition duration-200">
+                                    ${icons.PlusCircle} <span class="ml-1">Add Tenant</span>
+                                </button>
+                                <button data-property-id="${property.id}"
+                                    class="delete-property-btn bg-red-500 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-red-600 transition duration-200">
+                                    ${icons.Trash2} <span class="ml-1">Delete Property</span>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-3">Tenants in ${property.name}:</p>
+                        ${tenantsForProperty.length === 0 ? `
+                            <p class="text-gray-500 text-sm italic ml-4">No tenants added for this property yet or no matching tenants found.</p>
+                        ` : `
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white rounded-lg shadow-sm">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Name</th>
+                                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">House No.</th>
+                                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        ${tenantsForProperty.map(tenant => {
+                                            const balanceColor = tenant.outstandingBalance > 0 ? 'text-red-600 font-semibold' : 'text-green-600';
+                                            const balanceText = tenant.outstandingBalance > 0 ? `Ksh ${tenant.outstandingBalance.toFixed(2)} Due` : 'Paid';
+                                            return `
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${tenant.name}</td>
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${tenant.houseNumber}</td>
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${tenant.houseType}</td>
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">Ksh ${tenant.amountCharged.toFixed(2)}</td>
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm ${balanceColor}">${balanceText}</td>
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-800">${tenant.phoneNumber}</td>
+                                                <td class="py-3 px-4 whitespace-nowrap text-sm">
+                                                    <div class="flex space-x-2">
+                                                        <button data-tenant-id="${tenant.id}"
+                                                            class="payment-btn text-purple-600 hover:text-purple-800 transition duration-200"
+                                                            title="Record Payment">
+                                                            ${icons.Wallet}
+                                                        </button>
+                                                        <button data-tenant-id="${tenant.id}"
+                                                            class="edit-tenant-btn text-blue-600 hover:text-blue-800 transition duration-200"
+                                                            title="Edit Tenant">
+                                                            ${icons.Edit}
+                                                        </button>
+                                                        <button data-tenant-id="${tenant.id}"
+                                                            class="delete-tenant-btn text-red-600 hover:text-red-800 transition duration-200"
+                                                            title="Delete Tenant">
+                                                            ${icons.Trash2}
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        `;}).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `}
+                    </div>
+                `;
+            }).join('');
+
+            // Attach event listeners after rendering
+            propertiesListDiv.querySelectorAll('.add-tenant-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const propertyId = e.currentTarget.dataset.propertyId;
+                    const selectedProperty = properties.find(p => p.id === propertyId);
+                    if (selectedProperty) showAddEditTenantModal(selectedProperty);
+                });
+            });
+            propertiesListDiv.querySelectorAll('.delete-property-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const propertyId = e.currentTarget.dataset.propertyId;
+                    handleDeleteProperty(propertyId);
+                });
+            });
+            propertiesListDiv.querySelectorAll('.edit-tenant-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const tenantId = e.currentTarget.dataset.tenantId;
+                    const tenantToEdit = tenants.find(t => t.id === tenantId);
+                    if (tenantToEdit) showAddEditTenantModal(properties.find(p => p.id === tenantToEdit.propertyId), tenantToEdit);
+                });
+            });
+            propertiesListDiv.querySelectorAll('.delete-tenant-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const tenantId = e.currentTarget.dataset.tenantId;
+                    handleDeleteTenant(tenantId);
+                });
+            });
+            propertiesListDiv.querySelectorAll('.payment-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const tenantId = e.currentTarget.dataset.tenantId;
+                    const tenant = tenants.find(t => t.id === tenantId);
+                    if (tenant) showPaymentModal(tenant);
+                });
+            });
+        }
+
+        async function showAddPropertyModal() {
+            let newPropertyName = '';
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'p-4';
+            contentDiv.innerHTML = `
+                <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalPropertyName">
+                    Property Name
+                </label>
+                <input
+                    type="text"
+                    id="modalPropertyName"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g., Green Valley Apartments"
+                    required
+                />
+            `;
+
+            showModal(
+                "Add New Property",
+                contentDiv,
+                'confirm',
+                async () => {
+                    newPropertyName = document.getElementById('modalPropertyName').value.trim();
+                    if (newPropertyName) {
+                        await handleAddProperty(newPropertyName);
+                    } else {
+                        showModal("Error", "Property name cannot be empty.");
+                    }
+                }
+            );
+            // Focus on the input field after the modal is rendered
+            setTimeout(() => {
+                const input = document.getElementById('modalPropertyName');
+                if (input) input.focus();
+            }, 100);
+        }
+
+        async function showAddEditTenantModal(selectedProperty, editingTenant = null) {
+            let newTenantData = editingTenant ? { ...editingTenant } : {
+                name: '', houseNumber: '', houseType: 'Apartment', amountCharged: '', phoneNumber: '', propertyId: selectedProperty.id, lastWaterReading: 0, outstandingBalance: 0
+            };
+
+            const modalTitle = editingTenant ? "Edit Tenant" : `Add Tenant to ${selectedProperty.name}`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'p-4 space-y-4';
+            contentDiv.innerHTML = `
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalTenantName">
+                        Tenant Name
+                    </label>
+                    <input
+                        type="text"
+                        id="modalTenantName"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., John Doe"
+                        value="${newTenantData.name}"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalHouseNumber">
+                        House Number
+                    </label>
+                    <input
+                        type="text"
+                        id="modalHouseNumber"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., A-101"
+                        value="${newTenantData.houseNumber}"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalHouseType">
+                        House Type
+                    </label>
+                    <select
+                        id="modalHouseType"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        required
+                    >
+                        ${houseTypes.map(type => `<option value="${type}" ${newTenantData.houseType === type ? 'selected' : ''}>${type}</option>`).join('')}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalAmountCharged">
+                        Amount Charged (Ksh)
+                    </label>
+                    <input
+                        type="number"
+                        id="modalAmountCharged"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., 15000"
+                        value="${newTenantData.amountCharged}"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalPhoneNumber">
+                        Phone Number
+                    </label>
+                    <input
+                        type="text"
+                        id="modalPhoneNumber"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., +2547XXXXXXXX"
+                        value="${newTenantData.phoneNumber}"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="modalLastWaterReading">
+                        Last Water Reading
+                    </label>
+                    <input
+                        type="number"
+                        id="modalLastWaterReading"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., 100"
+                        value="${newTenantData.lastWaterReading}"
+                        required
+                    />
+                </div>
+            `;
+
+            showModal(
+                modalTitle,
+                contentDiv,
+                'confirm',
+                async () => {
+                    newTenantData.name = document.getElementById('modalTenantName').value.trim();
+                    newTenantData.houseNumber = document.getElementById('modalHouseNumber').value.trim();
+                    newTenantData.houseType = document.getElementById('modalHouseType').value;
+                    newTenantData.amountCharged = document.getElementById('modalAmountCharged').value.trim();
+                    newTenantData.phoneNumber = document.getElementById('modalPhoneNumber').value.trim();
+                    newTenantData.lastWaterReading = parseFloat(document.getElementById('modalLastWaterReading').value) || 0;
+
+
+                    if (!newTenantData.name || !newTenantData.houseNumber || !newTenantData.amountCharged || !newTenantData.phoneNumber) {
+                        showModal("Error", "Please fill all required tenant fields.");
+                        return;
+                    }
+
+                    await handleSaveTenant(newTenantData, editingTenant);
+                }
+            );
+        }
+
+        async function showPaymentModal(tenant) {
+            let paymentAmount = '';
+            let paymentDate = new Date().toISOString().split('T')[0]; // Default to today
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'p-4 space-y-4';
+            contentDiv.innerHTML = `
+                <p class="text-lg font-semibold text-gray-800">Record Payment for: ${tenant.name} (House ${tenant.houseNumber})</p>
+                <p class="text-md text-gray-700">Outstanding Balance: <span class="font-bold text-red-600">Ksh ${tenant.outstandingBalance.toFixed(2)}</span></p>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="paymentAmount">
+                        Amount Paid (Ksh)
+                    </label>
+                    <input
+                        type="number"
+                        id="paymentAmount"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., 10000"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2" for="paymentDate">
+                        Payment Date
+                    </label>
+                    <input
+                        type="date"
+                        id="paymentDate"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        value="${paymentDate}"
+                        required
+                    />
+                </div>
+            `;
+
+            showModal(
+                "Record Payment",
+                contentDiv,
+                'confirm',
+                async () => {
+                    paymentAmount = parseFloat(document.getElementById('paymentAmount').value) || 0;
+                    paymentDate = document.getElementById('paymentDate').value;
+
+                    if (paymentAmount <= 0) {
+                        showModal("Error", "Payment amount must be greater than zero.");
+                        return;
+                    }
+                    await handleRecordPayment(tenant.id, paymentAmount, paymentDate);
+                }
+            );
+        }
+
+        function renderBillingSection(parentEl) {
+            parentEl.innerHTML = `
+                <section class="bg-white rounded-xl shadow-md p-6 mb-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Billing & Receipts</h3>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Bill Generation Form -->
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-700 mb-4">Generate New Bill</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="filterPropertyBilling" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Filter by Property
+                                    </label>
+                                    <select
+                                        id="filterPropertyBilling"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                                    >
+                                        <option value="">All Properties</option>
+                                        ${properties.map(property => `
+                                            <option value="${property.id}" ${selectedPropertyForBillingFilter === property.id ? 'selected' : ''}>
+                                                ${property.name}
+                                            </option>
+                                        `).join('')}
+                                    </select>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">Search and Select Tenant</label>
+                                    <div class="relative">
+                                        <input type="text" id="billingTenantSearchInput" placeholder="Search tenant by name or house number..."
+                                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            ${icons.Search}
+                                        </div>
+                                    </div>
+                                    <select
+                                        id="selectTenant"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                                        required
+                                    >
+                                        <option value="">-- Select a Tenant --</option>
+                                    </select>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="rent" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Rent (Ksh)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="rent"
+                                            name="rent"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="Auto-filled"
+                                            readonly
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="lastWaterReading" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Last Water Reading
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="lastWaterReading"
+                                            name="lastWaterReading"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-100"
+                                            placeholder="e.g., 100"
+                                            readonly
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="currentWaterReading" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Current Water Reading
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="currentWaterReading"
+                                            name="currentWaterReading"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="e.g., 120"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="waterPricePerUnit" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Water Price per Unit (Ksh)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="waterPricePerUnit"
+                                            name="waterPricePerUnit"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            value="${WATER_PRICE_PER_UNIT}"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="waterAmount" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Water Amount (Calculated)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="waterAmount"
+                                            name="waterAmount"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100"
+                                            placeholder="Auto-calculated"
+                                            readonly
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="garbageAmount" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Garbage Amount (Ksh)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="garbageAmount"
+                                            name="garbageAmount"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="e.g., 300"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="otherPayments" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Other Payments (Ksh)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="otherPayments"
+                                            name="otherPayments"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="e.g., 200"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="paymentDeadline" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Payment Deadline
+                                        </label>
+                                        <input
+                                            type="date"
+                                            id="paymentDeadline"
+                                            name="paymentDeadline"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 p-4 bg-blue-50 rounded-lg flex justify-between items-center">
+                                    <span class="text-lg font-semibold text-blue-800">Total Payment:</span>
+                                    <span id="totalPaymentDisplay" class="text-2xl font-bold text-blue-800">Ksh 0.00</span>
+                                </div>
+
+                                <button id="generateBillBtn"
+                                    class="w-full bg-purple-600 text-white py-3 rounded-lg flex items-center justify-center hover:bg-purple-700 transition duration-200 shadow-md mt-6">
+                                    ${icons.FileText} <span class="ml-2">Generate Bill & Save</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Generated Bills History -->
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-700 mb-4">Generated Bills History</h4>
+                            <div class="mb-4 flex items-center space-x-3">
+                                <label for="billingHistoryFilterMonth" class="text-sm font-medium text-gray-700">Month:</label>
+                                <input type="month" id="billingHistoryFilterMonth" class="px-3 py-2 border rounded-lg bg-white">
+                                <button id="printAllReceiptsBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-indigo-700 transition duration-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer mr-2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14H3v7a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-7h-3"/><path d="M11 17H7"/><path d="M14 17H10"/></svg>
+                                    Print All This Month
+                                </button>
+                            </div>
+                            <div id="generatedBillsList" class="space-y-4 max-h-96 overflow-y-auto">
+                                ${bills.length === 0 ? `
+                                    <p class="text-gray-600 text-center py-8">No bills generated yet.</p>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            `;
+
+            // Attach event listeners for billing form
+            document.getElementById('filterPropertyBilling').addEventListener('change', (e) => {
+                selectedPropertyForBillingFilter = e.target.value;
+                updateBillingTenantDropdown(); // Re-populate tenant dropdown based on property filter
+                updateGeneratedBillsList(); // Update history based on new filter
+            });
+            document.getElementById('billingTenantSearchInput').value = billingTenantSearchQuery; // Set initial value
+            document.getElementById('billingTenantSearchInput').addEventListener('input', (e) => {
+                billingTenantSearchQuery = e.target.value;
+                updateBillingTenantDropdown(); // Re-populate tenant dropdown based on search query
+            });
+            document.getElementById('selectTenant').addEventListener('change', populateBillFormForTenant);
+            document.getElementById('currentWaterReading').addEventListener('input', calculateWaterAmount);
+            document.getElementById('waterPricePerUnit').addEventListener('input', calculateWaterAmount);
+
+            const billFormElements = ['garbageAmount', 'otherPayments']; // Rent is auto-filled now
+            billFormElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', updateBillTotal);
+                }
+            });
+            document.getElementById('generateBillBtn').addEventListener('click', handleGenerateBill);
+
+            // History filter and print button
+            document.getElementById('billingHistoryFilterMonth').value = billingHistoryFilterMonth;
+            document.getElementById('billingHistoryFilterMonth').addEventListener('change', (e) => {
+                billingHistoryFilterMonth = e.target.value;
+                updateGeneratedBillsList();
+            });
+            document.getElementById('printAllReceiptsBtn').addEventListener('click', downloadAllPdfReceiptsForCurrentMonth);
+
+            // Initial population and list update
+            updateBillingTenantDropdown(); // Populate tenant dropdown initially
+            populateBillFormForTenant(); // Populate based on initial filter or no filter
+            updateGeneratedBillsList(); // Initial render of bills
+        }
+
+        function updateBillingTenantDropdown() {
+            const selectTenantDropdown = document.getElementById('selectTenant');
+            if (!selectTenantDropdown) return;
+
+            let filteredTenants = tenants;
+
+            // Filter by property
+            if (selectedPropertyForBillingFilter) {
+                filteredTenants = filteredTenants.filter(t => t.propertyId === selectedPropertyForBillingFilter);
+            }
+
+            // Filter by search query
+            const query = billingTenantSearchQuery.toLowerCase();
+            if (query) {
+                filteredTenants = filteredTenants.filter(tenant =>
+                    tenant.name.toLowerCase().includes(query) ||
+                    tenant.houseNumber.toLowerCase().includes(query)
+                );
+            }
+
+            let optionsHtml = '<option value="">-- Select a Tenant --</option>';
+
+            // Group tenants by property for optgroup
+            const groupedTenants = properties.reduce((acc, property) => {
+                const tenantsInProperty = filteredTenants.filter(t => t.propertyId === property.id);
+                if (tenantsInProperty.length > 0) {
+                    acc[property.name] = tenantsInProperty;
+                }
+                return acc;
+            }, {});
+
+            for (const propertyName in groupedTenants) {
+                optionsHtml += `<optgroup label="${propertyName}">`;
+                groupedTenants[propertyName].forEach(tenant => {
+                    optionsHtml += `<option value="${tenant.id}">${tenant.name} (House No: ${tenant.houseNumber})</option>`;
+                });
+                optionsHtml += `</optgroup>`;
+            }
+
+            selectTenantDropdown.innerHTML = optionsHtml;
+
+            // After updating the dropdown, ensure the form fields are correctly populated/cleared
+            populateBillFormForTenant();
+        }
+
+        function populateBillFormForTenant() {
+            const selectedTenantId = document.getElementById('selectTenant').value;
+            const selectedTenant = tenants.find(t => t.id === selectedTenantId);
+
+            if (selectedTenant) {
+                document.getElementById('rent').value = selectedTenant.amountCharged || '';
+                document.getElementById('lastWaterReading').value = selectedTenant.lastWaterReading || 0;
+                document.getElementById('currentWaterReading').value = ''; // Clear current reading for new input
+                document.getElementById('waterAmount').value = ''; // Clear calculated water amount
+                document.getElementById('garbageAmount').value = ''; // Clear for new bill
+                document.getElementById('otherPayments').value = ''; // Clear for new bill
+                document.getElementById('paymentDeadline').value = ''; // Clear for new bill
+                updateBillTotal(); // Recalculate total after populating rent
+            } else {
+                // Clear all fields if no tenant is selected
+                document.getElementById('rent').value = '';
+                document.getElementById('lastWaterReading').value = '';
+                document.getElementById('currentWaterReading').value = '';
+                document.getElementById('waterAmount').value = '';
+                document.getElementById('garbageAmount').value = '';
+                document.getElementById('otherPayments').value = '';
+                document.getElementById('paymentDeadline').value = '';
+                document.getElementById('totalPaymentDisplay').textContent = 'Ksh 0.00';
+            }
+            calculateWaterAmount(); // Ensure water amount is calculated after tenant selection
+        }
+
+        function calculateWaterAmount() {
+            const lastReading = parseFloat(document.getElementById('lastWaterReading').value) || 0;
+            const currentReading = parseFloat(document.getElementById('currentWaterReading').value) || 0;
+            const pricePerUnit = parseFloat(document.getElementById('waterPricePerUnit').value) || 0;
+
+            let waterUnits = 0;
+            if (currentReading >= lastReading) {
+                waterUnits = currentReading - lastReading;
+            } else {
+                // Handle case where current reading is less than last reading (e.g., meter reset)
+                // For simplicity, we'll assume 0 units if current < last for now,
+                // or you might want to show an error/warning.
+                // For a real system, this would need more robust handling.
+                // showModal("Warning", "Current water reading is less than last month's reading. Assuming 0 units for this bill. Please verify meter readings.");
+                waterUnits = 0; // Or handle as an error that prevents bill generation
+            }
+
+            const waterAmount = waterUnits * pricePerUnit;
+            document.getElementById('waterAmount').value = waterAmount.toFixed(2);
+            updateBillTotal(); // Recalculate total after water amount changes
+        }
+
+        function updateBillTotal() {
+            const rent = parseFloat(document.getElementById('rent').value) || 0;
+            const waterAmount = parseFloat(document.getElementById('waterAmount').value) || 0;
+            const garbageAmount = parseFloat(document.getElementById('garbageAmount').value) || 0;
+            const otherPayments = parseFloat(document.getElementById('otherPayments').value) || 0;
+            const total = rent + waterAmount + garbageAmount + otherPayments;
+            document.getElementById('totalPaymentDisplay').textContent = `Ksh ${total.toFixed(2)}`;
+        }
+
+        function updateGeneratedBillsList() {
+            const generatedBillsListDiv = document.getElementById('generatedBillsList');
+            if (!generatedBillsListDiv) return;
+
+            // Filter bills by selected property and selected month
+            const filteredBills = bills.filter(bill => {
+                const billMonth = bill.billDate.substring(0, 7); // YYYY-MM
+                const matchesMonth = (billingHistoryFilterMonth === '' || billMonth === billingHistoryFilterMonth);
+                
+                // Ensure propertyNameId exists before filtering
+                const matchesProperty = (selectedPropertyForBillingFilter === '' || bill.propertyNameId === selectedPropertyForBillingFilter);
+
+                return matchesMonth && matchesProperty;
+            });
+
+            if (filteredBills.length === 0) {
+                generatedBillsListDiv.innerHTML = `<p class="text-gray-600 text-center py-8">No bills generated for this selection yet.</p>`;
+                return;
+            }
+
+            generatedBillsListDiv.innerHTML = filteredBills.map(bill => `
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="font-semibold text-gray-800">${bill.tenantName} - ${bill.propertyName} (House ${bill.houseNumber})</p>
+                        <span class="text-sm text-gray-600">${new Date(bill.billDate).toLocaleDateString('en-KE')}</span>
+                    </div>
+                    <p class="text-sm text-gray-700">Total: <span class="font-bold text-blue-700">Ksh ${bill.totalPayment.toFixed(2)}</span></p>
+                    <p class="text-sm text-gray-700">Deadline: ${new Date(bill.paymentDeadline).toLocaleDateString('en-KE')}</p>
+                    <div class="mt-3 flex justify-end">
+                        <button data-bill-id="${bill.id}"
+                            class="view-receipt-btn bg-green-500 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-green-600 transition duration-200">
+                            ${icons.FileText} <span class="ml-2">View/Download Receipt</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            generatedBillsListDiv.querySelectorAll('.view-receipt-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const billId = e.currentTarget.dataset.billId;
+                    const selectedBill = bills.find(b => b.id === billId);
+                    if (selectedBill) generatePdfReceipt(selectedBill);
+                });
+            });
+        }
+
+        function renderFinancialSection(parentEl) {
+            const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
+
+            // Filter bills and payments based on selected property
+            const filteredBillsForFinance = selectedPropertyForFinanceFilter
+                ? bills.filter(bill => bill.propertyNameId === selectedPropertyForFinanceFilter)
+                : bills;
+
+            const filteredPaymentsForFinance = selectedPropertyForFinanceFilter
+                ? payments.filter(payment => {
+                    const tenant = tenants.find(t => t.id === payment.tenantId);
+                    return tenant && tenant.propertyId === selectedPropertyForFinanceFilter;
+                })
+                : payments;
+
+            const filteredTenantsForFinance = selectedPropertyForFinanceFilter
+                ? tenants.filter(tenant => tenant.propertyId === selectedPropertyForFinanceFilter)
+                : tenants;
+
+
+            const billsThisMonth = filteredBillsForFinance.filter(bill => bill.billDate.substring(0, 7) === currentMonth);
+            const totalBilledThisMonth = billsThisMonth.reduce((sum, bill) => sum + bill.totalPayment, 0);
+
+            const paymentsThisMonth = filteredPaymentsForFinance.filter(payment => payment.paymentDate.substring(0, 7) === currentMonth);
+            const totalPaidThisMonth = paymentsThisMonth.reduce((sum, payment) => sum + payment.amountPaid, 0);
+
+            const outstandingBalanceThisMonth = totalBilledThisMonth - totalPaidThisMonth;
+
+            const overallOutstandingBalance = filteredTenantsForFinance.reduce((sum, tenant) => sum + tenant.outstandingBalance, 0);
+
+
+            parentEl.innerHTML = `
+                <section class="bg-white rounded-xl shadow-md p-6 mb-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Financial Overview (Current Month: ${new Date().toLocaleString('en-KE', { month: 'long', year: 'numeric' })})</h3>
+
+                    <div class="mb-4">
+                        <label for="filterPropertyFinance" class="block text-sm font-medium text-gray-700 mb-1">
+                            Filter by Property
+                        </label>
+                        <select
+                            id="filterPropertyFinance"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        >
+                            <option value="">All Properties</option>
+                            ${properties.map(property => `
+                                <option value="${property.id}" ${selectedPropertyForFinanceFilter === property.id ? 'selected' : ''}>
+                                    ${property.name}
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-blue-50 p-6 rounded-xl shadow-sm border border-blue-200">
+                            <p class="text-blue-700 text-sm font-medium">Total Billed This Month</p>
+                            <h3 class="text-3xl font-bold text-blue-900">Ksh ${totalBilledThisMonth.toFixed(2)}</h3>
+                        </div>
+                        <div class="bg-green-50 p-6 rounded-xl shadow-sm border border-green-200">
+                            <p class="text-green-700 text-sm font-medium">Total Paid This Month</p>
+                            <h3 class="text-3xl font-bold text-green-900">Ksh ${totalPaidThisMonth.toFixed(2)}</h3>
+                        </div>
+                        <div class="bg-yellow-50 p-6 rounded-xl shadow-sm border border-yellow-200">
+                            <p class="text-yellow-700 text-sm font-medium">Net Outstanding This Month</p>
+                            <h3 class="text-3xl font-bold text-yellow-900">Ksh ${outstandingBalanceThisMonth.toFixed(2)}</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-purple-50 p-6 rounded-xl shadow-sm border border-purple-200">
+                        <p class="text-purple-700 text-sm font-medium">Overall Outstanding Balance (All Tenants in Filter)</p>
+                        <h3 class="text-3xl font-bold text-purple-900">Ksh ${overallOutstandingBalance.toFixed(2)}</h3>
+                    </div>
+
+                    <h4 class="text-xl font-semibold text-gray-700 mt-8 mb-4">Recent Payments (Filtered)</h4>
+                    <div class="overflow-x-auto max-h-60 overflow-y-auto">
+                        <table class="min-w-full bg-white rounded-lg shadow-sm">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenant</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount Paid</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">New Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                ${filteredPaymentsForFinance.length === 0 ? `
+                                    <tr><td colspan="5" class="py-3 px-4 text-center text-gray-600">No payments recorded yet for this selection.</td></tr>
+                                ` : filteredPaymentsForFinance.slice(0, 10).map(payment => `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="py-3 px-4 text-sm text-gray-800">${tenants.find(t => t.id === payment.tenantId)?.name || 'N/A'}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">Ksh ${payment.amountPaid.toFixed(2)}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${new Date(payment.paymentDate).toLocaleDateString('en-KE')}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${payment.type}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">Ksh ${payment.newBalance.toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            `;
+
+            // Add event listener for the new finance property filter
+            document.getElementById('filterPropertyFinance').addEventListener('change', (e) => {
+                selectedPropertyForFinanceFilter = e.target.value;
+                renderDashboardPage(); // Re-render the entire dashboard to update the finance section
+            });
+        }
+
+
+        // Event Handlers (CRUD and Auth)
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const loginError = document.getElementById('loginError');
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            loginError.classList.add('hidden'); // Hide previous errors
+
+            try {
+                if (email === '' && password === '') {
+                    // Anonymous sign-in for demo
+                    await signInAnonymously(auth);
+                    showModal("Demo Login", "You are signed in anonymously for a demo experience. Your data will be saved uniquely.");
+                } else {
+                    // Attempt to sign in with email and password
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showModal("Login Successful", "Welcome back!");
+                }
+            } catch (error) {
+                console.error("Firebase Auth Error:", error);
+                let errorMessage = "An unknown error occurred. Please try again.";
+                switch (error.code) {
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address format.';
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = 'This user account has been disabled.';
+                        break;
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = 'Invalid credentials. If you are a new user, entering an email and password will create an account.';
+                        break;
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'This email is already in use. Please log in or use a different email.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password is too weak. Please use a stronger password (at least 6 characters).';
+                        break;
+                    default:
+                        errorMessage = `Authentication failed: ${error.message}`;
+                }
+                loginError.textContent = errorMessage;
+                loginError.classList.remove('hidden');
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await auth.signOut();
+                showModal("Logged Out", "You have been successfully logged out.");
+            } catch (error) {
+                console.error("Error logging out:", error);
+                showModal("Logout Error", `Failed to log out: ${error.message}`);
+            }
+        }
+
+        async function handleAddProperty(propertyName) {
+            try {
+                const newProperty = {
+                    name: propertyName,
+                    createdAt: new Date().toISOString(),
+                };
+                await addDoc(propertyCollectionRef, newProperty);
+                showModal("Success", `Property "${propertyName}" added successfully!`);
+            } catch (error) {
+                console.error("Error adding property:", error);
+                showModal("Error", `Failed to add property: ${error.message}`);
+            }
+        }
+
+        async function handleDeleteProperty(propertyId) {
+            showModal("Confirm Deletion", "Are you sure you want to delete this property and all its associated tenants, bills, and payments?", 'confirm', async () => {
+                try {
+                    // Delete property document
+                    await deleteDoc(doc(propertyCollectionRef, propertyId));
+
+                    // Delete associated tenants
+                    const tenantsToDelete = tenants.filter(t => t.propertyId === propertyId);
+                    for (const tenant of tenantsToDelete) {
+                        await deleteDoc(doc(tenantCollectionRef, tenant.id));
+                    }
+
+                    // Delete associated bills
+                    const billsToDelete = bills.filter(b => tenantsToDelete.some(t => t.id === b.tenantId));
+                    for (const bill of billsToDelete) {
+                        await deleteDoc(doc(billCollectionRef, bill.id));
+                    }
+
+                    // Delete associated payments
+                    const paymentsToDelete = payments.filter(p => tenantsToDelete.some(t => t.id === p.tenantId));
+                    for (const payment of paymentsToDelete) {
+                        await deleteDoc(doc(paymentCollectionRef, payment.id));
+                    }
+
+                    showModal("Success", "Property and associated data deleted successfully!");
+                } catch (error) {
+                    console.error("Error deleting property and associated data:", error);
+                    showModal("Error", `Failed to delete property: ${error.message}`);
+                }
+            });
+        }
+
+        async function handleSaveTenant(tenantData, editingTenant) {
+            try {
+                const tenantToSave = {
+                    ...tenantData,
+                    amountCharged: parseFloat(tenantData.amountCharged), // Ensure amount is a number
+                    lastWaterReading: parseFloat(tenantData.lastWaterReading) || 0, // Ensure it's a number
+                    updatedAt: new Date().toISOString(),
+                };
+
+                if (editingTenant) {
+                    // Update existing tenant
+                    await setDoc(doc(tenantCollectionRef, editingTenant.id), tenantToSave);
+                    showModal("Success", "Tenant updated successfully!");
+                } else {
+                    // Add new tenant
+                    tenantToSave.createdAt = new Date().toISOString();
+                    tenantToSave.outstandingBalance = 0; // New tenants start with 0 balance
+                    await addDoc(tenantCollectionRef, tenantToSave);
+                    showModal("Success", "Tenant added successfully!");
+                }
+            } catch (error) {
+                console.error("Error saving tenant:", error);
+                showModal("Error", `Failed to save tenant: ${error.message}`);
+            }
+        }
+
+        async function handleDeleteTenant(tenantId) {
+            showModal("Confirm Deletion", "Are you sure you want to delete this tenant and their associated bills/payments?", 'confirm', async () => {
+                try {
+                    await deleteDoc(doc(tenantCollectionRef, tenantId));
+
+                    // Delete associated bills
+                    const billsToDelete = bills.filter(b => b.tenantId === tenantId);
+                    for (const bill of billsToDelete) {
+                        await deleteDoc(doc(billCollectionRef, bill.id));
+                    }
+
+                    // Delete associated payments
+                    const paymentsToDelete = payments.filter(p => p.tenantId === tenantId);
+                    for (const payment of paymentsToDelete) {
+                        await deleteDoc(doc(paymentCollectionRef, payment.id));
+                    }
+
+                    showModal("Success", "Tenant and associated data deleted successfully!");
+                } catch (error) {
+                    console.error("Error deleting tenant and associated data:", error);
+                    showModal("Error", `Failed to delete tenant: ${error.message}`);
+                }
+            });
+        }
+
+        async function handleRecordPayment(tenantId, amountPaid, paymentDate) {
+            try {
+                const tenantDocRef = doc(tenantCollectionRef, tenantId);
+                const tenantSnap = await getDoc(tenantDocRef);
+
+                if (!tenantSnap.exists()) {
+                    showModal("Error", "Tenant not found for payment.");
+                    return;
+                }
+
+                const tenant = tenantSnap.data();
+                const newBalance = Math.max(0, tenant.outstandingBalance - amountPaid); // Balance cannot go below 0
+
+                const paymentType = amountPaid >= tenant.outstandingBalance ? 'Full' : 'Partial';
+
+                const newPayment = {
+                    tenantId: tenantId,
+                    amountPaid: amountPaid,
+                    paymentDate: paymentDate,
+                    type: paymentType,
+                    previousBalance: tenant.outstandingBalance,
+                    newBalance: newBalance,
+                    createdAt: new Date().toISOString()
+                };
+
+                await addDoc(paymentCollectionRef, newPayment);
+                await updateDoc(tenantDocRef, { outstandingBalance: newBalance });
+
+                showModal("Payment Recorded", `Payment of Ksh ${amountPaid.toFixed(2)} recorded for ${tenant.name}. New balance: Ksh ${newBalance.toFixed(2)}.`);
+            } catch (error) {
+                console.error("Error recording payment:", error);
+                showModal("Error", `Failed to record payment: ${error.message}`);
+            }
+        }
+
+
+        async function handleGenerateBill() {
+            const selectedTenantId = document.getElementById('selectTenant').value;
+            const rent = parseFloat(document.getElementById('rent').value) || 0;
+            const lastWaterReading = parseFloat(document.getElementById('lastWaterReading').value) || 0;
+            const currentWaterReading = parseFloat(document.getElementById('currentWaterReading').value) || 0;
+            const waterPricePerUnit = parseFloat(document.getElementById('waterPricePerUnit').value) || 0;
+            const waterAmount = parseFloat(document.getElementById('waterAmount').value) || 0; // This is already calculated
+            const garbageAmount = parseFloat(document.getElementById('garbageAmount').value) || 0;
+            const otherPayments = parseFloat(document.getElementById('otherPayments').value) || 0;
+            const paymentDeadline = document.getElementById('paymentDeadline').value;
+            const totalPayment = parseFloat(document.getElementById('totalPaymentDisplay').textContent.replace('Ksh ', '')) || 0;
+
+
+            if (!selectedTenantId || !rent || !paymentDeadline) {
+                showModal("Input Error", "Please select a tenant and fill in Rent and Payment Deadline.");
+                return;
+            }
+            if (currentWaterReading < lastWaterReading) {
+                 showModal("Input Error", "Current water reading cannot be less than last month's reading.");
+                 return;
+            }
+
+            const selectedTenant = tenants.find(t => t.id === selectedTenantId);
+            if (!selectedTenant) {
+                showModal("Error", "Selected tenant not found.");
+                return;
+            }
+
+            try {
+                const billToSave = {
+                    tenantId: selectedTenant.id,
+                    tenantName: selectedTenant.name,
+                    houseNumber: selectedTenant.houseNumber,
+                    propertyName: properties.find(p => p.id === selectedTenant.propertyId)?.name || 'N/A', // Display name
+                    propertyNameId: selectedTenant.propertyId, // Store ID for filtering
+                    rent: rent,
+                    waterUnits: currentWaterReading - lastWaterReading,
+                    waterAmount: waterAmount,
+                    garbageAmount: garbageAmount,
+                    otherPayments: otherPayments,
+                    totalPayment: totalPayment,
+                    paymentDeadline: paymentDeadline,
+                    billDate: new Date().toISOString(),
+                    servedBy: "Prince Alex Property Management",
+                    paymentAccount: "M-Pesa Paybill: 123456, Account No: [House No.]",
+                    logoUrl: "https://placehold.co/100x100/4F46E5/FFFFFF?text=Logo",
+                    createdAt: new Date().toISOString(),
+                };
+
+                await addDoc(billCollectionRef, billToSave);
+
+                // Update tenant's lastWaterReading and outstandingBalance
+                const tenantDocRef = doc(tenantCollectionRef, selectedTenantId);
+                await updateDoc(tenantDocRef, {
+                    lastWaterReading: currentWaterReading,
+                    outstandingBalance: totalPayment // New bill becomes the outstanding balance
+                });
+
+                showModal("Success", "Bill generated and saved successfully!");
+                // Reset form fields
+                document.getElementById('selectTenant').value = '';
+                document.getElementById('rent').value = '';
+                document.getElementById('lastWaterReading').value = '';
+                document.getElementById('currentWaterReading').value = '';
+                document.getElementById('waterAmount').value = '';
+                document.getElementById('garbageAmount').value = '';
+                document.getElementById('otherPayments').value = '';
+                document.getElementById('paymentDeadline').value = '';
+                document.getElementById('totalPaymentDisplay').textContent = 'Ksh 0.00';
+                // Firestore listeners will trigger re-render, no need to call renderDashboardPage directly
+            } catch (error) {
+                console.error("Error generating bill:", error);
+                showModal("Error", `Failed to generate bill: ${error.message}`);
+            }
+        }
+
+        function generatePdfReceipt(bill) {
+            const receiptHtml = `
+                <div id="receipt-content-inner" class="p-8 bg-white max-w-2xl mx-auto border border-gray-300 rounded-lg shadow-lg" style="font-family: 'Inter', sans-serif;">
+                    <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+                        <img src="${bill.logoUrl}" alt="Company Logo" class="h-20 w-20 rounded-full shadow-md">
+                        <div class="text-right">
+                            <h1 class="text-3xl font-bold text-gray-800">RENT RECEIPT</h1>
+                            <p class="text-gray-600 text-sm">Prince Alex Property</p>
+                            <p class="text-gray-600 text-sm">Nairobi, Kenya</p>
+                            <p class="text-gray-600 text-sm">info@princealex.com | +254 7XX XXX XXX</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-8 text-sm">
+                        <div>
+                            <p class="font-semibold text-gray-700">Bill To:</p>
+                            <p class="text-gray-800">${bill.tenantName}</p>
+                            <p class="text-gray-800">${bill.propertyName}, House No: ${bill.houseNumber}</p>
+                            <p class="text-gray-800">Phone: ${tenants.find(t => t.id === bill.tenantId)?.phoneNumber || 'N/A'}</p>
+                        </div>
+                        <div class="text-right">
+                            <p><span class="font-semibold text-gray-700">Receipt Date:</span> ${new Date(bill.billDate).toLocaleDateString('en-KE')}</p>
+                            <p><span class="font-semibold text-gray-700">Payment Deadline:</span> ${new Date(bill.paymentDeadline).toLocaleDateString('en-KE')}</p>
+                            <p><span class="font-semibold text-gray-700">Served By:</span> ${bill.servedBy}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <table class="min-w-full bg-gray-50 rounded-lg overflow-hidden">
+                            <thead class="bg-gray-200">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Description</th>
+                                    <th class="py-3 px-4 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Amount (Ksh)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="py-3 px-4 text-sm text-gray-800">Monthly Rent</td>
+                                    <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.rent.toFixed(2)}</td>
+                                </tr>
+                                ${bill.waterAmount > 0 ? `
+                                <tr>
+                                    <td class="py-3 px-4 text-sm text-gray-800">Water Charges (${bill.waterUnits || 'N/A'} units)</td>
+                                    <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.waterAmount.toFixed(2)}</td>
+                                </tr>` : ''}
+                                ${bill.garbageAmount > 0 ? `
+                                <tr>
+                                    <td class="py-3 px-4 text-sm text-gray-800">Garbage Collection</td>
+                                    <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.garbageAmount.toFixed(2)}</td>
+                                </tr>` : ''}
+                                ${bill.otherPayments > 0 ? `
+                                <tr>
+                                    <td class="py-3 px-4 text-sm text-gray-800">Other Payments</td>
+                                    <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.otherPayments.toFixed(2)}</td>
+                                </tr>` : ''}
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-gray-100">
+                                    <td class="py-3 px-4 text-left text-base font-semibold text-gray-800">Total Amount Due</td>
+                                    <td class="py-3 px-4 text-right text-lg font-bold text-blue-700">Ksh ${bill.totalPayment.toFixed(2)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="text-center text-sm text-gray-700 mb-8">
+                        <p class="font-semibold">Payment Details:</p>
+                        <p>${bill.paymentAccount}</p>
+                        <p>Thank you for your prompt payment!</p>
+                    </div>
+
+                    <div class="text-center text-xs text-gray-500 pt-4 border-t border-gray-200">
+                        <p>&copy; ${new Date().getFullYear()} Prince Alex Property. All rights reserved.</p>
+                    </div>
+                </div>
+            `;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.id = 'receipt-content-wrapper';
+            contentDiv.className = 'overflow-y-auto max-h-[70vh]';
+            contentDiv.innerHTML = receiptHtml;
+
+            showModal(
+                "Rent Receipt Preview",
+                contentDiv,
+                'custom', // Use a custom type to control buttons
+                null // No direct confirm action for this modal
+            );
+
+            // Add download button to the modal footer
+            const modalFooter = document.querySelector('.modal-footer');
+            if (modalFooter) {
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200';
+                downloadBtn.textContent = 'Download PDF';
+                downloadBtn.addEventListener('click', () => downloadPdf(bill));
+                modalFooter.appendChild(downloadBtn);
+            }
+        }
+
+        async function downloadPdf(bill) {
+            const input = document.getElementById('receipt-content-inner'); // Target the inner content
+            if (input) {
+                try {
+                    const canvas = await html2canvas(input, { scale: 2 });
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jspdf.jsPDF('p', 'mm', 'a4'); // Correct way to access jsPDF
+                    const imgWidth = 210; // A4 width in mm
+                    const pageHeight = 297; // A4 height in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    pdf.save(`rent-receipt-${bill.tenantName.replace(/\s/g, '-')}-${bill.houseNumber}.pdf`);
+                } catch (err) {
+                    console.error("Error generating PDF:", err);
+                    showModal("Error", "Failed to generate PDF. Please try again.");
+                }
+            }
+        }
+
+        async function downloadAllPdfReceiptsForCurrentMonth() {
+            const currentMonth = billingHistoryFilterMonth; // Use the selected month from the filter
+            const billsToPrint = bills.filter(bill => {
+                const billMonth = bill.billDate.substring(0, 7);
+                const matchesMonth = (billMonth === currentMonth);
+                
+                // Corrected property filtering for "Print All" button
+                const matchesProperty = (selectedPropertyForBillingFilter === '' || bill.propertyNameId === selectedPropertyForBillingFilter);
+                return matchesMonth && matchesProperty;
+            });
+
+            if (billsToPrint.length === 0) {
+                showModal("No Bills", "No bills found for the selected property and month to print.");
+                return;
+            }
+
+            showModal("Generating Receipts", `Generating ${billsToPrint.length} receipts... This may take a moment.`, 'alert');
+
+            for (const bill of billsToPrint) {
+                const receiptHtml = `
+                    <div class="p-8 bg-white max-w-2xl mx-auto border border-gray-300 rounded-lg shadow-lg" style="font-family: 'Inter', sans-serif;">
+                        <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+                            <img src="${bill.logoUrl}" alt="Company Logo" class="h-20 w-20 rounded-full shadow-md">
+                            <div class="text-right">
+                                <h1 class="text-3xl font-bold text-gray-800">RENT RECEIPT</h1>
+                                <p class="text-gray-600 text-sm">Prince Alex Property</p>
+                                <p class="text-gray-600 text-sm">Nairobi, Kenya</p>
+                                <p class="text-gray-600 text-sm">info@princealex.com | +254 7XX XXX XXX</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-8 text-sm">
+                            <div>
+                                <p class="font-semibold text-gray-700">Bill To:</p>
+                                <p class="text-gray-800">${bill.tenantName}</p>
+                                <p class="text-gray-800">${bill.propertyName}, House No: ${bill.houseNumber}</p>
+                                <p class="text-gray-800">Phone: ${tenants.find(t => t.id === bill.tenantId)?.phoneNumber || 'N/A'}</p>
+                            </div>
+                            <div class="text-right">
+                                <p><span class="font-semibold text-gray-700">Receipt Date:</span> ${new Date(bill.billDate).toLocaleDateString('en-KE')}</p>
+                                <p><span class="font-semibold text-gray-700">Payment Deadline:</span> ${new Date(bill.paymentDeadline).toLocaleDateString('en-KE')}</p>
+                                <p><span class="font-semibold text-gray-700">Served By:</span> ${bill.servedBy}</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <table class="min-w-full bg-gray-50 rounded-lg overflow-hidden">
+                                <thead class="bg-gray-200">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Description</th>
+                                        <th class="py-3 px-4 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Amount (Ksh)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="py-3 px-4 text-sm text-gray-800">Monthly Rent</td>
+                                        <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.rent.toFixed(2)}</td>
+                                    </tr>
+                                    ${bill.waterAmount > 0 ? `
+                                    <tr>
+                                        <td class="py-3 px-4 text-sm text-gray-800">Water Charges (${bill.waterUnits || 'N/A'} units)</td>
+                                        <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.waterAmount.toFixed(2)}</td>
+                                    </tr>` : ''}
+                                    ${bill.garbageAmount > 0 ? `
+                                    <tr>
+                                        <td class="py-3 px-4 text-sm text-gray-800">Garbage Collection</td>
+                                        <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.garbageAmount.toFixed(2)}</td>
+                                    </tr>` : ''}
+                                    ${bill.otherPayments > 0 ? `
+                                    <tr>
+                                        <td class="py-3 px-4 text-sm text-gray-800">Other Payments</td>
+                                        <td class="py-3 px-4 text-right text-sm text-gray-800">${bill.otherPayments.toFixed(2)}</td>
+                                    </tr>` : ''}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="bg-gray-100">
+                                        <td class="py-3 px-4 text-left text-base font-semibold text-gray-800">Total Amount Due</td>
+                                        <td class="py-3 px-4 text-right text-lg font-bold text-blue-700">Ksh ${bill.totalPayment.toFixed(2)}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="text-center text-sm text-gray-700 mb-8">
+                            <p class="font-semibold">Payment Details:</p>
+                            <p>${bill.paymentAccount}</p>
+                            <p>Thank you for your prompt payment!</p>
+                        </div>
+
+                        <div class="text-center text-xs text-gray-500 pt-4 border-t border-gray-200">
+                            <p>&copy; ${new Date().getFullYear()} Prince Alex Property. All rights reserved.</p>
+                        </div>
+                    </div>
+                `;
+
+                // Create a temporary div to render HTML for canvas
+                const tempDiv = document.createElement('div');
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                tempDiv.innerHTML = receiptHtml;
+                document.body.appendChild(tempDiv);
+
+                try {
+                    const canvas = await html2canvas(tempDiv, { scale: 2 });
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 210;
+                    const pageHeight = 297;
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    pdf.save(`rent-receipt-${bill.tenantName.replace(/\s/g, '-')}-${bill.houseNumber}.pdf`);
+                } catch (err) {
+                    console.error("Error generating PDF for all receipts:", err);
+                    showModal("Error", `Failed to generate PDF for ${bill.tenantName}. Please try again.`);
+                } finally {
+                    document.body.removeChild(tempDiv); // Clean up temporary div
+                }
+            }
+            showModal("Receipts Generated", "All selected receipts have been generated and downloaded.");
+        }
+
+
+        // Initial render when the page loads
+        document.addEventListener('DOMContentLoaded', initializeFirebase);
+    </script>
+</body>
+</html>
