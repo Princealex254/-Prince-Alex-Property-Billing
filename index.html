@@ -217,12 +217,10 @@
                 // Safely parse __firebase_config
                 try {
                     const rawConfigString = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-                    // Only parse if rawConfigString is not an empty string, otherwise it's already {}
-                    // If rawConfigString is just '{}', JSON.parse will handle it, but it's effectively an empty config.
-                    if (rawConfigString && rawConfigString !== '{}') { // Added check for empty string and empty object string
+                    if (rawConfigString && rawConfigString !== '{}') {
                         firebaseConfig = JSON.parse(rawConfigString);
                     } else if (rawConfigString === '{}') {
-                        firebaseConfig = {}; // Explicitly set to empty object if it's just '{}'
+                        firebaseConfig = {};
                     }
                 } catch (e) {
                     console.error("Error parsing Firebase configuration string:", e);
@@ -232,7 +230,6 @@
                 }
 
                 // Crucial check: Ensure firebaseConfig has an apiKey before initializing
-                // This handles cases where __firebase_config was empty or parsed to an empty object.
                 if (!firebaseConfig.apiKey) {
                     console.error("Firebase configuration is missing API Key. Cannot initialize Firebase.");
                     showModal("Configuration Error", "Firebase API Key is missing. Please ensure Firebase is correctly configured in the environment.");
@@ -240,12 +237,37 @@
                     return;
                 }
 
-                firebaseApp = initializeApp(firebaseConfig);
-                
-                db = getFirestore(firebaseApp);
-                auth = getAuth(firebaseApp);
+                // Initialize Firebase App
+                try {
+                    firebaseApp = initializeApp(firebaseConfig);
+                } catch (e) {
+                    console.error("Error initializing Firebase App:", e);
+                    showModal("Firebase Initialization Error", `Failed to initialize Firebase App: ${e.message}. Please check your Firebase configuration.`);
+                    renderLoginPage();
+                    return;
+                }
+
+                // Ensure firebaseApp is valid before getting services
+                if (!firebaseApp) {
+                    console.error("Firebase App is null or undefined after initialization.");
+                    showModal("Firebase Error", "Firebase App object is invalid. Cannot proceed with services.");
+                    renderLoginPage();
+                    return;
+                }
+
+                // Get Firestore and Auth instances
+                try {
+                    db = getFirestore(firebaseApp);
+                    auth = getAuth(firebaseApp);
+                } catch (e) {
+                    console.error("Error getting Firebase services (Firestore/Auth):", e);
+                    showModal("Firebase Service Error", `Failed to get Firebase services: ${e.message}. This might indicate a problem with your Firebase project setup.`);
+                    renderLoginPage();
+                    return; // Exit if auth fails to initialize
+                }
 
                 // Set up authentication listener
+                // This will only run if 'auth' is successfully initialized
                 onAuthStateChanged(auth, async (currentUser) => {
                     if (currentUser) {
                         user = { displayName: currentUser.displayName || "Admin" };
@@ -267,24 +289,17 @@
                     }
                 });
 
-                // Initial sign-in attempt (using custom token if available, otherwise anonymous)
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    // If no initial token, the user will see the login page and can sign in via email/password or anonymously.
-                    // No explicit signInAnonymously here, as the login form handles it.
-                }
+                // No initial token provided, proceed to login page.
+                renderLoginPage();
 
             } catch (error) {
-                console.error("Error during Firebase initialization or authentication:", error);
+                // This catch block will handle any other unexpected errors
+                console.error("Unhandled error during Firebase setup:", error);
                 let errorMessage = `An unexpected error occurred during Firebase setup: ${error.message}`;
-                // More specific error messages for common Firebase issues
                 if (error.code === 'auth/network-request-failed') {
                     errorMessage = "Network error. Please check your internet connection.";
                 } else if (error.code === 'app/invalid-credential') {
                     errorMessage = "Firebase project credentials are invalid. Please check your Firebase configuration.";
-                } else if (error.message.includes("No Firebase App '[DEFAULT]' has been created")) {
-                    errorMessage = "Firebase App not initialized. This usually means your firebaseConfig is empty or invalid.";
                 }
                 showModal("Firebase Error", errorMessage);
                 renderLoginPage();
