@@ -117,9 +117,7 @@
             HomeIcon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`, // Reusing Home for HomeIcon
             Wallet: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h12a2 2 0 0 1 0 4H5a2 2 0 0 0 0 4h12a2 2 0 0 0 2-2v-3"/><path d="M22 7V4a1 1 0 0 0-1-1H3a2 2 0 0 0 0 4h18a1 1 0 0 0 1-1Z"/></svg>`,
             Search: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`,
-            DollarSign: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dollar-sign"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
-            Menu: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>`,
-            X: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`
+            DollarSign: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dollar-sign"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`
         };
 
 
@@ -132,13 +130,11 @@
         let bills = [];
         let payments = []; // New array for payment records
         let activeTab = 'summary'; // 'summary', 'properties', 'billing', 'finance'
-        // Removed global tenantSearchQuery, replaced by propertyTenantSearchQueries
+        let tenantSearchQuery = ''; // New state for tenant search in properties tab
         let billingTenantSearchQuery = ''; // New state for tenant search in billing tab
         let selectedPropertyForBillingFilter = ''; // New state for billing property filter
         let billingHistoryFilterMonth = new Date().toISOString().substring(0, 7); // YYYY-MM format, default to current month
         let selectedPropertyForFinanceFilter = ''; // New state for finance property filter
-        let isSidebarOpen = false; // New state for sidebar visibility on mobile
-        let propertyTenantSearchQueries = {}; // New state to store search queries per property
 
         const houseTypes = ['Apartment', 'Bungalow', 'Mansionette', 'Commercial Space', 'Shop'];
         const WATER_PRICE_PER_UNIT = 50; // Example: Ksh 50 per water unit
@@ -454,7 +450,7 @@
             appDiv.innerHTML = `
                 <div class="flex h-screen bg-gray-100">
                     <!-- Sidebar Navigation -->
-                    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-gray-800 text-white flex flex-col p-4 shadow-lg transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:flex">
+                    <aside class="w-64 bg-gray-800 text-white flex flex-col p-4 shadow-lg">
                         <div class="flex items-center mb-8">
                             <img src="https://placehold.co/40x40/4F46E5/FFFFFF?text=P" alt="Logo" class="rounded-full mr-3" />
                             <h1 class="text-2xl font-bold">Prince Alex</h1>
@@ -497,14 +493,11 @@
                     </aside>
 
                     <!-- Main Content Area -->
-                    <main class="flex-1 overflow-auto p-8 lg:ml-64">
+                    <main class="flex-1 overflow-auto p-8">
                         <!-- Header -->
                         <header class="bg-white rounded-xl shadow-md p-6 mb-8 flex justify-between items-center">
                             <h2 class="text-3xl font-bold text-gray-800">Welcome, ${userName}!</h2>
-                            <button id="menuToggleBtn" class="lg:hidden p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg">
-                                ${isSidebarOpen ? icons.X : icons.Menu}
-                            </button>
-                            <div class="hidden lg:flex space-x-4">
+                            <div class="flex space-x-4">
                                 <div class="flex items-center text-gray-600">
                                     ${icons.Calendar}
                                     <span class="ml-2">${new Date().toLocaleDateString('en-KE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
@@ -519,31 +512,22 @@
             `;
 
             // Add event listeners for navigation
-            document.getElementById('navSummary').addEventListener('click', () => { activeTab = 'summary'; isSidebarOpen = false; renderDashboardPage(); });
-            document.getElementById('navProperties').addEventListener('click', () => { activeTab = 'properties'; isSidebarOpen = false; renderDashboardPage(); });
-            document.getElementById('navBilling').addEventListener('click', () => { activeTab = 'billing'; isSidebarOpen = false; renderDashboardPage(); });
-            document.getElementById('navFinance').addEventListener('click', () => { activeTab = 'finance'; isSidebarOpen = false; renderDashboardPage(); });
+            document.getElementById('navSummary').addEventListener('click', () => { activeTab = 'summary'; renderDashboardPage(); });
+            document.getElementById('navProperties').addEventListener('click', () => { activeTab = 'properties'; renderDashboardPage(); });
+            document.getElementById('navBilling').addEventListener('click', () => { activeTab = 'billing'; renderDashboardPage(); });
+            document.getElementById('navFinance').addEventListener('click', () => { activeTab = 'finance'; renderDashboardPage(); });
             document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-
-            // Add event listener for the new hamburger menu button
-            document.getElementById('menuToggleBtn').addEventListener('click', () => {
-                isSidebarOpen = !isSidebarOpen;
-                renderDashboardPage(); // Re-render to apply sidebar class change
-            });
-
 
             // Render content based on active tab
             const contentSection = document.getElementById('contentSection');
-            if (contentSection) { // Ensure contentSection exists before rendering into it
-                if (activeTab === 'summary') {
-                    contentSection.innerHTML = renderSummarySection(totalProperties, totalTenants, billsGenerated);
-                } else if (activeTab === 'properties') {
-                    renderPropertiesSection(contentSection);
-                } else if (activeTab === 'billing') {
-                    renderBillingSection(contentSection);
-                } else if (activeTab === 'finance') {
-                    renderFinancialSection(contentSection);
-                }
+            if (activeTab === 'summary') {
+                contentSection.innerHTML = renderSummarySection(totalProperties, totalTenants, billsGenerated);
+            } else if (activeTab === 'properties') {
+                renderPropertiesSection(contentSection);
+            } else if (activeTab === 'billing') {
+                renderBillingSection(contentSection);
+            } else if (activeTab === 'finance') {
+                renderFinancialSection(contentSection);
             }
         }
 
@@ -583,6 +567,14 @@
                         </button>
                     </div>
 
+                    <div class="relative mb-6">
+                        <input type="text" id="tenantSearchInput" placeholder="Search tenants by name or house number..."
+                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            ${icons.Search}
+                        </div>
+                    </div>
+
                     <div id="propertiesList" class="space-y-6">
                         ${properties.length === 0 ? `
                             <p class="text-gray-600 text-center py-8">No properties added yet. Click "Add Property" to get started!</p>
@@ -592,6 +584,11 @@
             `;
 
             document.getElementById('addPropertyBtn').addEventListener('click', () => showAddPropertyModal());
+            document.getElementById('tenantSearchInput').value = tenantSearchQuery; // Set initial value
+            document.getElementById('tenantSearchInput').addEventListener('input', (e) => {
+                tenantSearchQuery = e.target.value;
+                updatePropertiesList(); // Re-render properties list with filtered tenants
+            });
             updatePropertiesList();
         }
 
@@ -604,15 +601,26 @@
                 return;
             }
 
-            propertiesListDiv.innerHTML = properties.map(property => {
-                const currentPropertySearchQuery = propertyTenantSearchQueries[property.id]?.toLowerCase() || '';
+            // Filter tenants based on search query
+            const filteredTenants = tenants.filter(tenant => {
+                const query = tenantSearchQuery.toLowerCase();
+                return tenant.name.toLowerCase().includes(query) ||
+                       tenant.houseNumber.toLowerCase().includes(query);
+            });
 
-                const tenantsForProperty = tenants.filter(t => 
-                    t.propertyId === property.id && 
-                    (currentPropertySearchQuery === '' || 
-                     t.name.toLowerCase().includes(currentPropertySearchQuery) || 
-                     t.houseNumber.toLowerCase().includes(currentPropertySearchQuery))
-                );
+            if (filteredTenants.length === 0 && tenantSearchQuery !== '') {
+                propertiesListDiv.innerHTML = `<p class="text-gray-600 text-center py-8">No tenants found matching "${tenantSearchQuery}".</p>`;
+                return;
+            }
+
+
+            propertiesListDiv.innerHTML = properties.map(property => {
+                const tenantsForProperty = filteredTenants.filter(t => t.propertyId === property.id);
+
+                // Only render property if it has tenants or if no search query is active
+                if (tenantsForProperty.length === 0 && tenantSearchQuery !== '') {
+                    return ''; // Don't render property if no matching tenants and search is active
+                }
 
                 return `
                     <div class="border border-gray-200 rounded-lg p-5 bg-gray-50 shadow-sm">
@@ -629,16 +637,6 @@
                                 </button>
                             </div>
                         </div>
-                        
-                        <div class="relative mb-4">
-                            <input type="text" id="tenantSearchInput-${property.id}" data-property-id="${property.id}" placeholder="Search tenants by name or house number in ${property.name}..."
-                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                   value="${currentPropertySearchQuery}">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                ${icons.Search}
-                            </div>
-                        </div>
-
                         <p class="text-gray-600 mb-3">Tenants in ${property.name}:</p>
                         ${tenantsForProperty.length === 0 ? `
                             <p class="text-gray-500 text-sm italic ml-4">No tenants added for this property yet or no matching tenants found.</p>
@@ -729,15 +727,6 @@
                     const tenantId = e.currentTarget.dataset.tenantId;
                     const tenant = tenants.find(t => t.id === tenantId);
                     if (tenant) showPaymentModal(tenant);
-                });
-            });
-
-            // Attach event listeners for per-property search inputs
-            propertiesListDiv.querySelectorAll('input[id^="tenantSearchInput-"]').forEach(input => {
-                input.addEventListener('input', (e) => {
-                    const propertyId = e.target.dataset.propertyId;
-                    propertyTenantSearchQueries[propertyId] = e.target.value;
-                    updatePropertiesList(); // Re-render to apply the filter
                 });
             });
         }
