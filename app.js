@@ -2023,162 +2023,213 @@ async function generateReceiptPdf(bill) {
     if (isNaN(billDate)) { showNotification("Invalid date.", "error"); return; }
     const tenant = tenants.find(t => t.id === bill.tenantId), property = properties.find(p => p.id === bill.propertyId);
     if (!tenant || !property) { showNotification("Missing info.", "error"); return; }
-    const rd = billDate.toLocaleDateString('en-KE', { year: 'numeric', month: 'long', day: 'numeric' });
-    const bp = new Date(bill.billingPeriod).toLocaleDateString('en-KE', { year: 'numeric', month: 'long' });
+    const rd = billDate.toLocaleDateString('en-KE', { year: 'numeric', month: 'short', day: 'numeric' });
+    const bp = new Date(bill.billingPeriod).toLocaleDateString('en-KE', { year: 'numeric', month: 'short' });
     const ob = tenant.outstandingBalance.toFixed(2);
-    const html = `<div style="font-family: 'Inter', sans-serif; width: 700px; margin: 0 auto; background: #ffffff; padding: 0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden;">
-        <!-- Header with gradient -->
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 40px; color: white;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h1 style="font-size: 32px; font-weight: 800; margin: 0; letter-spacing: -0.5px;">PA PROPERTY</h1>
-                    <p style="font-size: 13px; margin: 5px 0 0 0; opacity: 0.9;">Property Management Solutions</p>
-                    <p style="font-size: 12px; margin: 3px 0 0 0; opacity: 0.8;">Nairobi, Kenya</p>
+    
+    // Create print-ready receipt in a new window
+    const printWindow = window.open('', '_blank', 'width=400,height=600');
+    if (!printWindow) {
+        showNotification('Please allow popups to print receipts.', 'error');
+        return;
+    }
+    
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Receipt - ${bill.billReference}</title>
+            <style>
+                @media print {
+                    body { margin: 0; padding: 0; }
+                    .no-print { display: none !important; }
+                }
+                body {
+                    font-family: 'Courier New', monospace;
+                    width: 300px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background: #ffffff;
+                    color: #000;
+                }
+                .receipt {
+                    border: 2px solid #000;
+                    padding: 20px;
+                }
+                .header {
+                    text-align: center;
+                    border-bottom: 2px dashed #000;
+                    padding-bottom: 10px;
+                    margin-bottom: 15px;
+                }
+                .header h2 {
+                    font-size: 18px;
+                    font-weight: bold;
+                    margin: 0 0 5px 0;
+                }
+                .header p {
+                    font-size: 10px;
+                    margin: 2px 0;
+                }
+                .info-section {
+                    border-bottom: 1px solid #000;
+                    padding-bottom: 8px;
+                    margin-bottom: 12px;
+                }
+                .info-section p {
+                    font-size: 11px;
+                    margin: 3px 0;
+                }
+                .items-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    border-bottom: 1px solid #000;
+                    padding-bottom: 10px;
+                    margin-bottom: 12px;
+                }
+                .items-table th {
+                    text-align: left;
+                    font-size: 10px;
+                    padding: 4px 0;
+                    border-bottom: 1px solid #000;
+                }
+                .items-table td {
+                    font-size: 10px;
+                    padding: 5px 0;
+                    border-bottom: 1px dotted #ccc;
+                }
+                .items-table td:last-child {
+                    text-align: right;
+                }
+                .totals {
+                    margin-bottom: 12px;
+                }
+                .totals table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                .totals td {
+                    font-size: 11px;
+                    padding: 4px 0;
+                }
+                .totals td:last-child {
+                    text-align: right;
+                    font-weight: bold;
+                }
+                .footer {
+                    text-align: center;
+                    border-top: 2px dashed #000;
+                    padding-top: 10px;
+                    margin-top: 15px;
+                }
+                .footer p {
+                    font-size: 10px;
+                    margin: 3px 0;
+                }
+                .footer .amount {
+                    font-size: 14px;
+                    font-weight: bold;
+                    margin: 5px 0;
+                }
+                .footer .thank-you {
+                    font-size: 9px;
+                    color: #666;
+                    margin: 8px 0 0 0;
+                }
+                .footer .generated {
+                    font-size: 9px;
+                    color: #666;
+                    margin: 2px 0;
+                }
+                .print-btn {
+                    margin-top: 20px;
+                    padding: 10px 20px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    background: #000;
+                    color: #fff;
+                    border: none;
+                    cursor: pointer;
+                    width: 100%;
+                }
+                .print-btn:hover {
+                    background: #333;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="receipt">
+                <div class="header">
+                    <h2>PA PROPERTY</h2>
+                    <p>Nairobi, Kenya</p>
+                    <p>Tel: +254 700 000 000</p>
                 </div>
-                <div style="text-align: right;">
-                    <h2 style="font-size: 28px; font-weight: 700; margin: 0;">INVOICE</h2>
-                    <p style="font-size: 13px; margin: 5px 0 0 0; opacity: 0.9;">${bill.billReference || 'N/A'}</p>
-                </div>
-            </div>
-        </div>
 
-        <!-- Invoice Info Bar -->
-        <div style="background: #f9fafb; padding: 20px 40px; border-bottom: 1px solid #e5e7eb;">
-            <div style="display: flex; justify-content: space-between;">
-                <div>
-                    <p style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin: 0 0 5px 0;">Invoice Date</p>
-                    <p style="font-size: 14px; font-weight: 600; color: #111827; margin: 0;">${rd}</p>
+                <div class="info-section">
+                    <p><strong>Receipt No:</strong> ${bill.billReference || 'N/A'}</p>
+                    <p><strong>Date:</strong> ${rd}</p>
+                    <p><strong>Period:</strong> ${bp}</p>
                 </div>
-                <div>
-                    <p style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin: 0 0 5px 0;">Billing Period</p>
-                    <p style="font-size: 14px; font-weight: 600; color: #111827; margin: 0;">${bp}</p>
-                </div>
-                <div>
-                    <p style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin: 0 0 5px 0;">Due Date</p>
-                    <p style="font-size: 14px; font-weight: 600; color: #111827; margin: 0;">${new Date(billDate.getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-KE', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                </div>
-            </div>
-        </div>
 
-        <!-- Bill To Section -->
-        <div style="padding: 30px 40px;">
-            <div style="display: flex; justify-content: space-between; gap: 40px;">
-                <div style="flex: 1;">
-                    <p style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin: 0 0 10px 0;">Bill To</p>
-                    <div style="background: #f9fafb; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
-                        <p style="font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 5px 0;">${tenant.name}</p>
-                        <p style="font-size: 13px; color: #4b5563; margin: 0 0 3px 0;">${property.name}</p>
-                        <p style="font-size: 13px; color: #4b5563; margin: 0 0 3px 0;">House ${tenant.houseNumber}</p>
-                        <p style="font-size: 13px; color: #4b5563; margin: 0;">${tenant.phoneNumber}</p>
-                    </div>
+                <div class="info-section">
+                    <p><strong>Tenant:</strong> ${tenant.name}</p>
+                    <p><strong>Property:</strong> ${property.name}</p>
+                    <p><strong>House:</strong> ${tenant.houseNumber}</p>
                 </div>
-                <div style="flex: 1;">
-                    <p style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin: 0 0 10px 0;">Property Details</p>
-                    <div style="background: #f9fafb; padding: 15px; border-radius: 8px; border-left: 4px solid #764ba2;">
-                        <p style="font-size: 13px; color: #4b5563; margin: 0 0 5px 0;"><strong>Property:</strong> ${property.name}</p>
-                        <p style="font-size: 13px; color: #4b5563; margin: 0 0 5px 0;"><strong>Location:</strong> ${property.location}</p>
-                        <p style="font-size: 13px; color: #4b5563; margin: 0 0 5px 0;"><strong>Type:</strong> ${tenant.houseType}</p>
-                        <p style="font-size: 13px; color: #4b5563; margin: 0;"><strong>Lease:</strong> Active</p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Items Table -->
-        <div style="padding: 0 40px 30px 40px;">
-            <table style="width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
-                <thead>
-                    <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                        <th style="padding: 14px 16px; text-align: left; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Description</th>
-                        <th style="padding: 14px 16px; text-align: center; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Details</th>
-                        <th style="padding: 14px 16px; text-align: right; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr style="border-bottom: 1px solid #e5e7eb;">
-                        <td style="padding: 16px; font-size: 14px; font-weight: 600; color: #111827;">Monthly Rent</td>
-                        <td style="padding: 16px; font-size: 13px; color: #6b7280; text-align: center;">${tenant.houseType} - ${tenant.houseNumber}</td>
-                        <td style="padding: 16px; text-align: right; font-size: 14px; font-weight: 700; color: #111827;">${formatCurrency(bill.rentAmount || tenant.amountCharged)}</td>
-                    </tr>
-                    ${bill.waterAmount ? `<tr style="border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
-                        <td style="padding: 16px; font-size: 14px; font-weight: 600; color: #111827;">💧 Water Usage</td>
-                        <td style="padding: 16px; font-size: 13px; color: #6b7280; text-align: center;">${bill.waterUnitsUsed || 0} units × Ksh ${property.waterPricePerUnit || 200}/unit</td>
-                        <td style="padding: 16px; text-align: right; font-size: 14px; font-weight: 700; color: #111827;">${formatCurrency(bill.waterAmount)}</td>
-                    </tr>` : ''}
-                    ${bill.garbageAmount ? `<tr style="border-bottom: 1px solid #e5e7eb;">
-                        <td style="padding: 16px; font-size: 14px; font-weight: 600; color: #111827;">🗑️ Garbage Collection</td>
-                        <td style="padding: 16px; font-size: 13px; color: #6b7280; text-align: center;">Monthly service fee</td>
-                        <td style="padding: 16px; text-align: right; font-size: 14px; font-weight: 700; color: #111827;">${formatCurrency(bill.garbageAmount)}</td>
-                    </tr>` : ''}
-                </tbody>
-            </table>
-        </div>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th style="text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Rent (${tenant.houseType})</td>
+                            <td style="text-align: right;">${formatCurrency(bill.rentAmount || tenant.amountCharged)}</td>
+                        </tr>
+                        ${bill.waterAmount ? `<tr>
+                            <td>Water (${bill.waterUnitsUsed || 0} units)</td>
+                            <td style="text-align: right;">${formatCurrency(bill.waterAmount)}</td>
+                        </tr>` : ''}
+                        ${bill.garbageAmount ? `<tr>
+                            <td>Garbage Collection</td>
+                            <td style="text-align: right;">${formatCurrency(bill.garbageAmount)}</td>
+                        </tr>` : ''}
+                    </tbody>
+                </table>
 
-        <!-- Summary Section -->
-        <div style="padding: 0 40px 30px 40px;">
-            <div style="display: flex; justify-content: flex-end;">
-                <div style="width: 350px;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tbody>
-                            <tr style="border-bottom: 1px solid #e5e7eb;">
-                                <td style="padding: 10px 0; font-size: 14px; color: #6b7280; font-weight: 500;">Subtotal</td>
-                                <td style="padding: 10px 0; font-size: 14px; color: #111827; text-align: right; font-weight: 600;">${formatCurrency(bill.amount)}</td>
-                            </tr>
-                            <tr style="border-bottom: 2px solid #e5e7eb;">
-                                <td style="padding: 12px 0; font-size: 14px; color: #6b7280; font-weight: 500;">Previous Balance</td>
-                                <td style="padding: 12px 0; font-size: 14px; color: #111827; text-align: right; font-weight: 600;">${formatCurrency(tenant.outstandingBalance - bill.amount)}</td>
-                            </tr>
-                            <tr style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 6px;">
-                                <td style="padding: 14px 12px; font-size: 16px; font-weight: 700; color: white;">Total Due</td>
-                                <td style="padding: 14px 12px; font-size: 18px; font-weight: 800; color: white; text-align: right;">${formatCurrency(ob)}</td>
-                            </tr>
-                        </tbody>
+                <div class="totals">
+                    <table>
+                        <tr>
+                            <td><strong>Total:</strong></td>
+                            <td><strong>${formatCurrency(bill.amount)}</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Balance:</strong></td>
+                            <td><strong>${formatCurrency(ob)}</strong></td>
+                        </tr>
                     </table>
                 </div>
-            </div>
-        </div>
 
-        <!-- Payment Status -->
-        <div style="padding: 20px 40px; background: ${ob > 0 ? '#fef3c7' : '#d1fae5'}; border-top: 1px solid #e5e7eb;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 40px; height: 40px; border-radius: 50%; background: ${ob > 0 ? '#f59e0b' : '#10b981'}; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">
-                        ${ob > 0 ? '⚠️' : '✅'}
-                    </div>
-                    <div>
-                        <p style="font-size: 14px; font-weight: 700; color: #111827; margin: 0;">${ob > 0 ? 'Payment Pending' : 'Payment Complete'}</p>
-                        <p style="font-size: 12px; color: #6b7280; margin: 3px 0 0 0;">${ob > 0 ? 'Please process payment at your earliest convenience' : 'Thank you for your payment'}</p>
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <p style="font-size: 12px; color: #6b7280; margin: 0 0 3px 0;">Outstanding Balance</p>
-                    <p style="font-size: 20px; font-weight: 800; color: ${ob > 0 ? '#dc2626' : '#059669'}; margin: 0;">${formatCurrency(ob)}</p>
+                <div class="footer">
+                    <p><strong>${ob > 0 ? 'AMOUNT DUE' : 'PAID IN FULL'}</strong></p>
+                    <p class="amount">${formatCurrency(ob)}</p>
+                    <p class="thank-you">Thank you for your payment!</p>
+                    <p class="generated">Generated: ${new Date().toLocaleString('en-KE')}</p>
                 </div>
             </div>
-        </div>
-
-        <!-- Footer -->
-        <div style="padding: 25px 40px; background: #f9fafb; text-align: center; border-top: 1px solid #e5e7eb;">
-            <p style="font-size: 14px; color: #4b5563; margin: 0 0 8px 0; font-weight: 500;">Thank you for your business!</p>
-            <p style="font-size: 11px; color: #9ca3af; margin: 0 0 3px 0;">For inquiries, contact us at support@paproperty.co.ke | +254 700 000 000</p>
-            <p style="font-size: 10px; color: #9ca3af; margin: 5px 0 0 0;">Generated on ${new Date().toLocaleString('en-KE')}</p>
-        </div>
-    </div>`;
-    const temp = document.createElement('div');
-    temp.style.cssText = 'position:absolute;left:-9999px;width:700px';
-    temp.innerHTML = html;
-    document.body.appendChild(temp);
-    try {
-        const canvas = await html2canvas(temp, { scale: 2 });
-        const imgData = canvas.toDataURL('image/png');
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-        const iw = 210, ih = canvas.height * iw / canvas.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, iw, ih);
-        pdf.save(`rent-receipt-${tenant.name.replace(/\s/g, '-')}.pdf`);
-        showNotification(`PDF for ${tenant.name} downloaded.`, 'success');
-    } catch (err) { console.error(err); showNotification('PDF generation failed.', 'error'); }
-    finally { document.body.removeChild(temp); }
+            <button class="print-btn no-print" onclick="window.print()">🖨️ Print Receipt</button>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    
+    // Focus the print window
+    printWindow.focus();
+    
+    showNotification(`Receipt opened in new window. Click "Print Receipt" to print.`, 'success');
 }
 
 // ============================================================
