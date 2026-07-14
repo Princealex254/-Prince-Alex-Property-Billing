@@ -1575,7 +1575,8 @@ function handleGenerateBillForSingleTenant(form, tenant, currentMonthYear, callb
     const nb = tenant.outstandingBalance + tot;
     updateData('tenants', tenant.id, { currentWaterMeterReading: cr, lastWaterMeterReadingDate: new Date(rd).toISOString(), outstandingBalance: nb, lastBilledDate: new Date().toISOString() }).then(() => { const i = tenants.findIndex(t => t.id === tenant.id); if (i !== -1) { tenants[i].currentWaterMeterReading = cr; tenants[i].outstandingBalance = nb; }});
     const billReference = generateBillReference();
-    const nb2 = { id: generateUniqueId(), tenantId: tenant.id, tenantName: tenant.name, propertyId: tenant.propertyId, houseNumber: tenant.houseNumber, amount: tot, billingPeriod: currentMonthYear, billReference: billReference, rentAmount: tenant.amountCharged, waterAmount: wc, garbageAmount: gc, waterUnitsUsed: cr - (tenant.currentWaterMeterReading || 0), createdAt: new Date().toISOString() };
+    const previousBalance = tenant.outstandingBalance; // Store previous balance before adding new charges
+    const nb2 = { id: generateUniqueId(), tenantId: tenant.id, tenantName: tenant.name, propertyId: tenant.propertyId, houseNumber: tenant.houseNumber, amount: tot, billingPeriod: currentMonthYear, billReference: billReference, rentAmount: tenant.amountCharged, waterAmount: wc, garbageAmount: gc, waterUnitsUsed: cr - (tenant.currentWaterMeterReading || 0), previousBalance: previousBalance, createdAt: new Date().toISOString() };
     saveData('bills', nb2).then(sb => { if (sb) { bills.push(sb); logActivity('generate_bill', `Generated bill ${billReference} of ${formatCurrency(tot)} for ${tenant.name}`, 'bill', sb.id, tenant.propertyId); } updateGeneratedBillsList(); });
     showNotification(`Bill for ${tenant.name}: ${formatCurrency(tot)}`, 'success');
     callback();
@@ -1628,6 +1629,7 @@ function handleDeleteBill(billId) {
         showNotification("Bill deleted.", "success");
         if (activeTab === 'tenants') renderAllTenantsList();
         updatePropertiesList(); updateGeneratedBillsList(); renderFinancialSection(document.getElementById('contentSection'));
+        if (activeTab === 'summary') renderDashboardPage();
     });
 }
 
