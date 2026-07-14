@@ -199,7 +199,13 @@ function formatCurrency(amount) {
 }
 
 function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString('en-KE', { year: 'numeric', month: 'long', day: 'numeric' });
+    try {
+        // Handle Firestore timestamp objects
+        const date = dateString?.toDate ? dateString.toDate() : new Date(dateString);
+        return date.toLocaleDateString('en-KE', { year: 'numeric', month: 'long', day: 'numeric' });
+    } catch (e) {
+        return 'Invalid Date';
+    }
 }
 
 function createChart(canvasId, config) {
